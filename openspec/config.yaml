@@ -64,6 +64,7 @@ rules:
     - Specify whether the change affects the pipeline flow, crew I/O contracts, or agent behavior
     - Include impact on exit criteria if applicable
     - Call out if the change affects the retry protocol or human gate policy
+    - After proposal and ff are complete, commit and push all generated change artifacts to main
   specs:
     - Use Given/When/Then format for scenarios
     - Requirements MUST reference the affected crew(s) and agent(s) by name and number

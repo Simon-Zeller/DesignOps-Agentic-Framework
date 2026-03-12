@@ -14,6 +14,7 @@ artifacts:
       Create a proposal explaining WHY this change is needed and WHAT it changes.
       Reference PRD sections. Identify affected crews and agents.
       Include scope, non-goals, and impact on pipeline flow.
+      After creating the proposal, commit and push all generated artifacts to main.
     requires: []
 
   - id: specs
