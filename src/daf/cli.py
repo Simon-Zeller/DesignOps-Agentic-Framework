@@ -1,8 +1,12 @@
 """DAF CLI entry point."""
 
+import json
+from pathlib import Path
 from typing import Optional
 
 import typer
+
+from daf.validator import validate_profile
 
 app = typer.Typer(
     name="daf",
@@ -39,22 +43,46 @@ def init(
 ) -> None:
     """Initialise a new design system — runs the brand interview and generation pipeline."""
     if profile is not None:
-        typer.echo(
-            f"[daf] Profile mode: loading brand profile from '{profile}' "
-            "(interview skipped — not yet implemented, wired up in P02)."
-        )
+        _load_profile(profile)
         return
 
     if resume is not None:
         typer.echo(
             f"[daf] Resume mode: resuming from session '{resume}' "
-            "(resume logic not yet implemented, wired up in P02)."
+            "(resume logic not yet implemented — coming in P08)."
         )
         return
 
+    # Interactive interview
+    from daf.interview import run_interview
+
+    run_interview(cwd=Path.cwd())
+
+
+def _load_profile(profile_path: str) -> None:
+    """Load, validate, and confirm a pre-written brand profile (§13.5)."""
+    path = Path(profile_path)
+
+    if not path.exists():
+        typer.echo(f"Error: file not found: {profile_path}")
+        raise typer.Exit(code=1)
+
+    try:
+        data = json.loads(path.read_text())
+    except (json.JSONDecodeError, OSError) as exc:
+        typer.echo(f"Error: could not read profile: {exc}")
+        raise typer.Exit(code=1)
+
+    errors = validate_profile(data)
+    if errors:
+        typer.echo("Validation errors:")
+        for err in errors:
+            typer.echo(f"  • {err}")
+        raise typer.Exit(code=1)
+
+    typer.echo(f"Profile loaded: {profile_path}")
     typer.echo(
-        "[daf] Interactive interview: the 11-step brand interview "
-        "is not yet implemented (coming in P02)."
+        "  Next: pass this profile to the DS Bootstrap Crew (Agent 1)."
     )
 
 
