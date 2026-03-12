@@ -8,6 +8,10 @@ by the Brand Discovery Agent (P03).
 import re
 from typing import Any
 
+from daf.tools.theme_utils import ALIAS_INNER_RE as _ALIAS_INNER_RE
+from daf.tools.theme_utils import DTCG_ALIAS_RE as _DTCG_ALIAS_RE
+from daf.tools.theme_utils import walk_tokens as _walk_tokens
+
 VALID_ARCHETYPES = frozenset(
     {"enterprise-b2b", "consumer-b2c", "mobile-first", "multi-brand", "custom"}
 )
@@ -124,25 +128,6 @@ def validate_profile(data: dict[str, Any]) -> list[str]:
 # ---------------------------------------------------------------------------
 # Theming model validation (p05)
 # ---------------------------------------------------------------------------
-
-_DTCG_ALIAS_RE = re.compile(r"^\{[a-z0-9._-]+\}$")
-_ALIAS_INNER_RE = re.compile(r"^\{([a-z0-9._-]+)\}$")
-
-
-def _walk_tokens(
-    data: dict[str, Any],
-    path: str = "",
-) -> "list[tuple[str, dict[str, Any]]]":
-    """Yield (dot-path, token_dict) for every leaf token in a nested DTCG dict."""
-    results = []
-    for key, val in data.items():
-        current = f"{path}.{key}" if path else key
-        if isinstance(val, dict):
-            if "$value" in val:
-                results.append((current, val))
-            else:
-                results.extend(_walk_tokens(val, current))
-    return results
 
 
 def validate_theme_extensions(

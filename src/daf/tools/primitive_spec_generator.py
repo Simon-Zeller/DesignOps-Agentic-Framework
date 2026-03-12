@@ -12,11 +12,12 @@ Per the theme-provider spec (p05), the generated YAML must declare:
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 
-_THEME_PROVIDER_SPEC: dict = {
+_THEME_PROVIDER_SPEC: dict[str, Any] = {
     "component": "ThemeProvider",
     "description": (
         "React context provider that manages the active theme and brand for the "

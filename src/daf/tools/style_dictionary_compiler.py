@@ -16,14 +16,14 @@ Custom format: daf/css-theme-scope — wraps declarations in correct selector.
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import Any
 
 from crewai.tools import BaseTool
 from pydantic import BaseModel
 
-_ALIAS_INNER_RE = re.compile(r"^\{([a-z0-9._-]+)\}$")
+from daf.tools.theme_utils import ALIAS_INNER_RE as _ALIAS_INNER_RE
+from daf.tools.theme_utils import walk_tokens as _walk_tokens_shared
 
 
 # ---------------------------------------------------------------------------
@@ -58,22 +58,8 @@ def _resolve_token_value(
     return str(raw_value)
 
 
-def _walk_tokens(
-    data: dict[str, Any],
-    path: str = "",
-) -> list[tuple[str, dict[str, Any]]]:
-    """Yield (dot-path, token_dict) for every leaf token in nested DTCG dict."""
-    results = []
-    for key, val in data.items():
-        if key.startswith("$"):
-            continue
-        current = f"{path}.{key}" if path else key
-        if isinstance(val, dict):
-            if "$value" in val:
-                results.append((current, val))
-            else:
-                results.extend(_walk_tokens(val, current))
-    return results
+def _walk_tokens(data: dict[str, Any], path: str = "") -> list[tuple[str, dict[str, Any]]]:
+    return _walk_tokens_shared(data, path)
 
 
 def _token_path_to_css_var(token_path: str) -> str:

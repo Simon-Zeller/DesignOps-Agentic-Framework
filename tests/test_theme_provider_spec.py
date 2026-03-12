@@ -5,8 +5,6 @@ with the correct props, tokenBindings, and exports per the theme-provider spec.
 """
 from __future__ import annotations
 
-import pytest
-
 
 # ---------------------------------------------------------------------------
 # Tests

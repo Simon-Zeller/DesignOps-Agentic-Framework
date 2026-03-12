@@ -311,7 +311,7 @@ def test_multi_theme_uses_com_daf_themes_key(tmp_path, sample_global_palette, sa
 
 def test_bare_themes_key_raises_value_error(tmp_path, sample_global_palette, sample_scale_tokens):
     """WC3DTCGFormatter raises ValueError if internal logic would emit bare 'themes' key."""
-    from daf.tools.dtcg_formatter import WC3DTCGFormatter, _flat_to_nested_with_themes
+    from daf.tools.dtcg_formatter import _flat_to_nested_with_themes
 
     # Call the internal helper directly to verify the guard raises
     with pytest.raises(ValueError, match=r"com\.daf\.themes"):
