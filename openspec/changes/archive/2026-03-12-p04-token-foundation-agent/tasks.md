@@ -103,7 +103,7 @@
 - [x] 4.4 Run full test suite: `pytest tests/ -v -m "not integration"` — confirm no regressions in existing tests
 - [x] 4.5 Run new tests only: `pytest tests/test_color_palette_generator.py tests/test_modular_scale_calculator.py tests/test_contrast_safe_pairer.py tests/test_dtcg_formatter.py tests/test_token_foundation_agent.py -v -m "not integration"` — all must pass
 - [x] 4.6 Run coverage check: `pytest tests/test_color_palette_generator.py tests/test_modular_scale_calculator.py tests/test_contrast_safe_pairer.py tests/test_dtcg_formatter.py tests/test_token_foundation_agent.py --cov=src/daf/tools --cov=src/daf/agents/token_foundation --cov=src/daf/models --cov-report=term-missing -m "not integration"` — verify ≥80% line coverage, ≥70% branch coverage
-- [ ] 4.7 (Optional, requires `ANTHROPIC_API_KEY`) Run integration test: `pytest tests/test_token_foundation_agent.py -m integration -v`
+- [x] 4.7 (Optional, requires `ANTHROPIC_API_KEY`) Run integration test: `pytest tests/test_token_foundation_agent.py -m integration -v`
 
 ## 5. Git Hygiene
 
