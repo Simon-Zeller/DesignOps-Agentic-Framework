@@ -728,6 +728,8 @@ source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
     { name = "crewai" },
+    { name = "jsonschema" },
+    { name = "pydantic" },
     { name = "typer" },
 ]
 
@@ -743,7 +745,9 @@ dev = [
 requires-dist = [
     { name = "anthropic" },
     { name = "crewai" },
+    { name = "jsonschema" },
     { name = "mypy", marker = "extra == 'dev'" },
+    { name = "pydantic" },
     { name = "pytest", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "ruff", marker = "extra == 'dev'" },
