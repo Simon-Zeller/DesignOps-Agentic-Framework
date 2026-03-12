@@ -112,3 +112,57 @@ def run_brand_discovery(raw_profile: dict[str, Any]) -> BrandProfile:
         f"Brand Discovery Agent did not return a valid BrandProfile. "
         f"Raw output: {getattr(result, 'raw', repr(result))!r}"
     )
+
+
+def run_ds_bootstrap(
+    raw_profile: dict[str, Any],
+    output_dir: str = ".",
+) -> tuple[BrandProfile, Any]:
+    """Run both Task T1 (Brand Discovery) and Task T2 (Token Foundation) in sequence.
+
+    Returns:
+        A tuple of (enriched BrandProfile, TokenFoundationOutput).
+    """
+    from daf.agents.token_foundation import (
+        create_token_foundation_agent,
+        create_token_foundation_task,
+    )
+
+    agent_t1 = create_brand_discovery_agent()
+    task_t1 = create_brand_discovery_task(raw_profile)
+    task_t1.agent = agent_t1
+
+    # Run T1 first to get the enriched BrandProfile
+    crew_t1 = Crew(agents=[agent_t1], tasks=[task_t1], verbose=False)
+    result_t1 = crew_t1.kickoff()
+
+    pydantic_t1 = getattr(result_t1, "pydantic", None)
+    if pydantic_t1 is None:
+        raw_out: str | None = getattr(result_t1, "raw", None)
+        if raw_out:
+            import json as _json
+
+            try:
+                pydantic_t1 = BrandProfile.model_validate(_json.loads(raw_out))
+            except Exception:
+                pass
+    if pydantic_t1 is None:
+        raise ValueError(
+            f"Task T1 did not return a valid BrandProfile. "
+            f"Raw output: {getattr(result_t1, 'raw', repr(result_t1))!r}"
+        )
+
+    # Wire Task T2 with T1's output as context
+    agent_t2 = create_token_foundation_agent()
+    task_t2 = create_token_foundation_task(
+        profile=pydantic_t1,
+        output_dir=output_dir,
+        context_tasks=[task_t1],
+    )
+    task_t2.agent = agent_t2
+
+    crew_t2 = Crew(agents=[agent_t2], tasks=[task_t2], verbose=False)
+    result_t2 = crew_t2.kickoff()
+
+    pydantic_t2 = getattr(result_t2, "pydantic", None)
+    return pydantic_t1, pydantic_t2
