@@ -272,3 +272,75 @@ def _find_extensions_themes(data: dict) -> bool:
             if _find_extensions_themes(val):
                 return True
     return False
+
+
+# ---------------------------------------------------------------------------
+# p05 — com.daf.themes namespace tests (TDD red phase)
+# ---------------------------------------------------------------------------
+
+def test_multi_theme_uses_com_daf_themes_key(tmp_path, sample_global_palette, sample_scale_tokens):
+    """WC3DTCGFormatter must write $extensions.com.daf.themes, not bare $extensions.themes."""
+    from daf.tools.dtcg_formatter import WC3DTCGFormatter
+
+    theme_overrides = {
+        "interactive.primary.background": "color.primary.700",
+        "surface.default": "color.neutral.50",
+    }
+    tool = WC3DTCGFormatter()
+    written = tool._run(
+        global_palette=sample_global_palette,
+        scale_tokens=sample_scale_tokens,
+        semantic_overrides=theme_overrides,
+        component_overrides={},
+        themes=["light", "dark"],
+        brands={},
+        output_dir=str(tmp_path),
+    )
+    semantic_path = next(p for p in written if p.endswith("semantic.tokens.json"))
+    with open(semantic_path) as f:
+        data = json.load(f)
+
+    # Must find at least one token with $extensions.com.daf.themes
+    found_com_daf = _find_extensions_com_daf_themes(data)
+    assert found_com_daf, "Expected $extensions.com.daf.themes key in semantic tokens"
+
+    # Must NOT find any token with bare $extensions.themes
+    found_bare = _find_extensions_bare_themes(data)
+    assert not found_bare, "Found forbidden bare $extensions.themes key — must use com.daf.themes"
+
+
+def test_bare_themes_key_raises_value_error(tmp_path, sample_global_palette, sample_scale_tokens):
+    """WC3DTCGFormatter raises ValueError if internal logic would emit bare 'themes' key."""
+    from daf.tools.dtcg_formatter import WC3DTCGFormatter, _flat_to_nested_with_themes
+
+    # Call the internal helper directly to verify the guard raises
+    with pytest.raises(ValueError, match=r"com\.daf\.themes"):
+        _flat_to_nested_with_themes(
+            flat_tokens={"surface.default": "color.neutral.50"},
+            themes=["light", "dark"],
+            _force_bare_key=True,  # trigger the guard path
+        )
+
+
+def _find_extensions_com_daf_themes(data: dict) -> bool:
+    """Return True if any leaf token has $extensions.com.daf.themes."""
+    if "$value" in data:
+        ext = data.get("$extensions", {})
+        return "com.daf.themes" in ext
+    for key, val in data.items():
+        if isinstance(val, dict) and not key.startswith("$"):
+            if _find_extensions_com_daf_themes(val):
+                return True
+    return False
+
+
+def _find_extensions_bare_themes(data: dict) -> bool:
+    """Return True if any leaf token has bare $extensions.themes (wrong key)."""
+    if "$value" in data:
+        ext = data.get("$extensions", {})
+        return "themes" in ext and "com.daf.themes" not in ext
+    for key, val in data.items():
+        if isinstance(val, dict) and not key.startswith("$"):
+            if _find_extensions_bare_themes(val):
+                return True
+    return False
