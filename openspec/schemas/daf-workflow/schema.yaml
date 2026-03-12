@@ -61,7 +61,9 @@ artifacts:
       2. Implement production code to make tests pass
       3. Refactor and clean up
       4. Integration and linting
-      Include git workflow steps and verification gates.
+      Each section ends with a git checkpoint commit (`git add -A && git commit`).
+      This ensures no files are silently left untracked between phases.
+      Include delivery steps (merge, push, branch cleanup).
     requires:
       - tdd
 

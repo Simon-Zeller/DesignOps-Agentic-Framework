@@ -2,6 +2,10 @@
 
 > Follow strict TDD order: write tests first, then implement, then verify.
 > Check off each task as you complete it.
+>
+> **Git checkpoint rule:** After each numbered section, run `git add -A && git status`
+> to verify nothing is untracked. Commit with a conventional commit message before
+> moving to the next section. This prevents files from silently going missing.
 
 ## 0. Pre-flight
 
@@ -17,6 +21,7 @@
 - [ ] 1.1 [Create/update test file for feature area 1]
 - [ ] 1.2 [Create/update test file for feature area 2]
 - [ ] 1.3 Verify all new tests FAIL (red phase confirmation)
+- [ ] 1.4 **Git checkpoint:** `git add -A && git commit -m "test: scaffold failing tests for {{change-name}}"`
 
 ## 2. Implementation (TDD — Green Phase)
 
@@ -26,12 +31,14 @@
 - [ ] 2.1 [Implementation task — make test 1.1 pass]
 - [ ] 2.2 [Implementation task — make test 1.2 pass]
 - [ ] 2.3 Verify all tests PASS (green phase confirmation)
+- [ ] 2.4 **Git checkpoint:** `git add -A && git commit -m "feat: implement {{change-name}}"`
 
 ## 3. Refactor (TDD — Refactor Phase)
 
 - [ ] 3.1 Clean up implementation — remove duplication, improve naming
 - [ ] 3.2 Ensure all tests still pass after refactor
 - [ ] 3.3 Review code against design.md decisions
+- [ ] 3.4 **Git checkpoint:** `git add -A && git commit -m "refactor: clean up {{change-name}}"`
 
 ## 4. Integration & Quality
 
@@ -40,13 +47,14 @@
 - [ ] 4.3 Fix all lint and type errors — zero warnings policy
 - [ ] 4.4 Run full test suite (not just new tests)
 - [ ] 4.5 Verify no regressions in existing tests
+- [ ] 4.6 **Git checkpoint:** `git add -A && git commit -m "chore: fix lint and type errors for {{change-name}}"` (skip if no changes)
 
-## 5. Git Hygiene
+## 5. Final Verification & Push
 
-- [ ] 5.1 Stage changes with meaningful, atomic commits (conventional commits)
-- [ ] 5.2 Ensure no untracked files left behind
-- [ ] 5.3 Rebase on latest main if needed
-- [ ] 5.4 Push feature branch
+- [ ] 5.1 `git status` — confirm zero untracked files, zero unstaged changes
+- [ ] 5.2 `git log --oneline main..HEAD` — review all commits on this branch
+- [ ] 5.3 Rebase on latest main if needed (`git fetch origin && git rebase origin/main`)
+- [ ] 5.4 Push feature branch (`git push origin feat/{{change-name}}`)
 
 ## 6. Delivery
 
@@ -55,4 +63,4 @@
 - [ ] 6.3 Push main (`git push origin main`)
 - [ ] 6.4 Delete local feature branch (`git branch -d feat/{{change-name}}`)
 - [ ] 6.5 Delete remote feature branch (`git push origin --delete feat/{{change-name}}`)
-- [ ] 6.6 Verify clean state (`git branch -a` — feature branch gone)
+- [ ] 6.6 Verify clean state (`git branch -a` — feature branch gone, `git status` — clean)
