@@ -96,3 +96,4 @@ rules:
     - Keep individual tasks completable in one focused session
     - Final task must include lint, type-check, and full test suite verification
     - Delivery section must merge to main and delete feature branch (local + remote)
+    - If the change adds or modifies CLI commands, pipeline stages, agent wiring, or invocation flags, update scripts/bootstrap.sh to add/modify the corresponding stage so the full flow remains manually testable

@@ -64,6 +64,8 @@ artifacts:
       Each section ends with a git checkpoint commit (`git add -A && git commit`).
       This ensures no files are silently left untracked between phases.
       Include delivery steps (merge, push, branch cleanup).
+      If the change affects CLI commands, pipeline stages, or agent invocation,
+      update scripts/bootstrap.sh to reflect the new stage(s) or flags.
     requires:
       - tdd
 
