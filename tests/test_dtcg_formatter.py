@@ -158,9 +158,9 @@ def test_multi_theme_extensions_block(tmp_path, sample_global_palette, sample_sc
     semantic_path = next(p for p in written if p.endswith("semantic.tokens.json"))
     with open(semantic_path) as f:
         data = json.load(f)
-    # At least one token must have $extensions.themes
-    found = _find_extensions_themes(data)
-    assert found, "Expected at least one token with $extensions.themes in semantic tier"
+    # At least one token must have $extensions.com.daf.themes
+    found = _find_extensions_com_daf_themes(data)
+    assert found, "Expected at least one token with $extensions.com.daf.themes in semantic tier"
 
 
 def test_tokens_directory_created_if_absent(tmp_path, sample_global_palette, sample_scale_tokens, sample_semantic_overrides):
