@@ -1,0 +1,101 @@
+schema: daf-workflow
+
+context: |
+  Product: DAF Local — DesignOps Agentic Framework
+  A CLI that interviews users about their brand, then runs 45 specialized agents
+  across 9 crews (CrewAI) to generate a complete, validated, documented design
+  system as a local npm package on disk.
+
+  Tech stack:
+    Orchestration: CrewAI (Python) — agent/crew/task model
+    LLM: Anthropic exclusively (Claude Opus, Sonnet, Haiku) — tiered by task complexity
+    Token format: W3C DTCG — three tiers (global, semantic, component-scoped)
+    Token compilation: Style Dictionary
+    Generated output: React + TypeScript components
+    Testing: Vitest + @testing-library/react
+    Accessibility: axe-core
+    Visual regression: Playwright (headless screenshot baselines)
+    AST analysis: TypeScript Compiler API
+    Package format: npm local package
+
+  Architecture:
+    6-phase sequential pipeline with bounded inter-phase retry loops (max 3 per component, max 2 per crew for Phases 4-6)
+    9 crews: DS Bootstrap (6 agents), Token Engine (5), Design-to-Code (5),
+      Component Factory (4), Documentation (5), Governance (5), Analytics (5),
+      Release (5), AI Semantic Layer (5) = 45 agents total
+    Crew I/O via shared output folder — each crew reads/writes specific files
+    Agent-first, tool-assisted: agents decide, deterministic tools execute
+    Token-first: every visual decision originates as a design token
+    Human gates: exactly 2 (Brand Profile approval before generation, Output Review after)
+
+  Key patterns:
+    Canonical spec YAMLs (specs/*.spec.yaml) are the single source of truth for code generation
+    Delta specs in changes use ADDED/MODIFIED/REMOVED sections
+    Components compose from primitives (Box, Stack, Grid, Text, Icon, Pressable, Divider, Spacer, ThemeProvider)
+    ThemeProvider handles runtime theme switching via CSS class, not JS token toggling
+    Semantic tokens carry per-theme values via $extensions
+    Components consume only semantic tokens — never global tokens directly
+    Retry protocol feeds structured rejections back to generation agents with accumulating context
+    Rollback Agent (40) is cross-cutting — instantiated at pipeline start, not part of Release Crew task flow
+    Checkpoint system enables resume-on-failure via --resume flag
+
+  Component scope tiers:
+    Starter (10): Button, Input, Checkbox, Radio, Select, Card, Badge, Avatar, Alert, Modal
+    Standard (19): Starter + Table, Tabs, Accordion, Tooltip, Toast, Dropdown, Pagination, Breadcrumb, Navigation
+    Comprehensive (25+): Standard + DatePicker, DataGrid, TreeView, Drawer, Stepper, FileUpload, RichText
+    All tiers include 9 base primitives (11 exports)
+
+  Exit criteria: 8 Fatal (token validity, DTCG schema, reference resolution, WCAG contrast,
+    CSS references, TypeScript compilation, npm build) + 7 Warning = 15 total checks
+  Test failures are Warning (not Fatal) — generated tests may fail despite correct output
+
+  Development workflow: daf-workflow schema (TDD-first, verification-gated)
+    proposal → specs → design → tdd → tasks → [apply] → verification → [archive]
+    TDD: tests written before implementation, red-green-refactor cycle
+    DoD: zero lint/type errors, all tests pass, manual QA, acceptance criteria met, git hygiene
+    Git: feature branches, conventional commits, atomic changes, PR-based delivery
+
+  PRD: PRD.md (v1.0.0, March 2026) — always reference for detailed specs
+
+rules:
+  proposal:
+    - Reference specific PRD sections (§3.x, §4.x, etc.) when relevant
+    - Identify which crews and agents are affected by the proposed change
+    - Specify whether the change affects the pipeline flow, crew I/O contracts, or agent behavior
+    - Include impact on exit criteria if applicable
+    - Call out if the change affects the retry protocol or human gate policy
+  specs:
+    - Use Given/When/Then format for scenarios
+    - Requirements MUST reference the affected crew(s) and agent(s) by name and number
+    - Token-related specs must specify which tier (global/semantic/component) is affected
+    - Component-related specs must specify which scope tier(s) are affected (starter/standard/comprehensive)
+    - A11y specs must specify the target level (AA/AAA) and affected WCAG criteria
+    - Respect crew I/O contracts defined in PRD §3.6 — never have a crew produce artifacts outside its contract
+    - Every requirement MUST have explicit acceptance criteria (checkboxes) that map to verification
+  design:
+    - Distinguish between agent logic (LLM-driven) and deterministic tool logic
+    - Specify model tier assignment (Tier 1 Opus / Tier 2 Sonnet / Tier 3 Haiku / Deterministic) for new agents
+    - Include data flow diagrams showing crew-to-crew file handoffs
+    - Address retry behavior — what happens when the new logic fails validation
+    - Reference existing CrewAI patterns (Agent, Crew, Task, Tool) for consistency
+  tdd:
+    - Every test case MUST map to a specific requirement/scenario from specs
+    - Test files and locations must be specified explicitly
+    - Include both happy path and error/edge case tests
+    - Define coverage targets (minimum 80% line coverage per PRD quality gate)
+    - Tests must be written to FAIL first — verify red phase before implementation
+  tasks:
+    - Follow strict TDD order — test scaffolding (red) → implementation (green) → refactor
+    - Group tasks by crew/phase alignment (Phase 1 before Phase 2, etc.)
+    - Include lint and type-check tasks after implementation
+    - Include git workflow steps (branch, commit, push)
+    - Tag tasks that require changes to crew I/O contracts or pipeline-config.json schema
+    - Keep individual tasks completable in one focused session
+    - Final task must be "proceed to verification checklist"
+  verification:
+    - Every acceptance criterion from specs must appear as a checkbox
+    - Manual testing section must include evidence table (scenario, steps, expected, actual, pass/fail)
+    - Zero tolerance for lint errors, type errors, and critical test failures
+    - Git hygiene checks must verify conventional commits and clean branch state
+    - DoD summary table must show pass/fail status for all gates
+    - Nothing archives until all verification items are checked

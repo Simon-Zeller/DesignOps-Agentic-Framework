@@ -1,0 +1,81 @@
+name: daf-workflow
+version: 1
+description: |
+  Full DAF development workflow: proposal → specs → design → tdd → tasks → [apply] → verification → [archive].
+  Enforces TDD-first development, git discipline, manual testing, and a strict Definition of Done
+  before any change is considered complete.
+
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Intent, scope, affected crews/agents, and approach
+    template: proposal.md
+    instruction: |
+      Create a proposal explaining WHY this change is needed and WHAT it changes.
+      Reference PRD sections. Identify affected crews and agents.
+      Include scope, non-goals, and impact on pipeline flow.
+    requires: []
+
+  - id: specs
+    generates: specs/**/*.md
+    description: Behavioral requirements with Given/When/Then scenarios and acceptance criteria
+    template: specs.md
+    instruction: |
+      Write behavior-first requirements with concrete Given/When/Then scenarios.
+      Each requirement must reference affected crew(s) and agent(s) by name and number.
+      Include explicit acceptance criteria that can be verified in the verification artifact.
+    requires:
+      - proposal
+
+  - id: design
+    generates: design.md
+    description: Technical approach, architecture decisions, data flow, retry behavior
+    template: design.md
+    instruction: |
+      Document the technical approach and architecture decisions.
+      Distinguish agent logic from deterministic tool logic.
+      Include data flow diagrams and address retry/failure behavior.
+    requires:
+      - proposal
+
+  - id: tdd
+    generates: tdd.md
+    description: Test specifications and test plan written BEFORE implementation (TDD-first)
+    template: tdd.md
+    instruction: |
+      Define the complete test plan BEFORE any implementation begins.
+      Specify test cases derived from specs scenarios and design decisions.
+      This artifact drives TDD — tests are written first, implementation follows.
+    requires:
+      - specs
+      - design
+
+  - id: tasks
+    generates: tasks.md
+    description: Implementation checklist — tests first (TDD), then production code, then integration
+    template: tasks.md
+    instruction: |
+      Create the implementation checklist following strict TDD order:
+      1. Write/scaffold tests first (from tdd.md)
+      2. Implement production code to make tests pass
+      3. Refactor and clean up
+      4. Integration and linting
+      Include git workflow steps and verification gates.
+    requires:
+      - tdd
+
+  - id: verification
+    generates: verification.md
+    description: Post-implementation Definition of Done checklist — lint, tests, manual QA, git hygiene
+    template: verification.md
+    instruction: |
+      Create the verification checklist to be completed AFTER implementation (/opsx:apply).
+      This is the Definition of Done gate. Cover: test results, lint/type safety,
+      manual testing, git workflow, acceptance criteria sign-off.
+      Nothing ships until every item is checked.
+    requires:
+      - tasks
+
+apply:
+  requires: [tasks]
+  tracks: tasks.md
