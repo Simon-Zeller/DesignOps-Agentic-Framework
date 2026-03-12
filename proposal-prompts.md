@@ -47,8 +47,8 @@ For each proposal, run these two steps:
 > **Workflow per proposal:**
 > 1. `/opsx:propose <name>` — paste the prompt from below, creates the proposal artifact
 > 2. `/opsx:ff <name>` — generates specs, design, tdd, and tasks in one shot
-> 3. `/opsx:apply <name>` — implement the tasks (code gets written)
-> 4. `/opsx:archive <name>` — seal the change, merge to main
+> 3. `/opsx:apply <name>` — implement the tasks (code gets written, branch merged, feature branch deleted local + remote)
+> 4. `/opsx:archive <name>` — seal the change
 
 ---
 

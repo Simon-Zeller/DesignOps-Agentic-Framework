@@ -48,6 +48,11 @@
 - [ ] 5.3 Rebase on latest main if needed
 - [ ] 5.4 Push feature branch
 
-## 6. Ready for Verification
+## 6. Delivery
 
 - [ ] 6.1 All tasks above are checked
+- [ ] 6.2 Merge feature branch into main (`git checkout main && git merge feat/{{change-name}}`)
+- [ ] 6.3 Push main (`git push origin main`)
+- [ ] 6.4 Delete local feature branch (`git branch -d feat/{{change-name}}`)
+- [ ] 6.5 Delete remote feature branch (`git push origin --delete feat/{{change-name}}`)
+- [ ] 6.6 Verify clean state (`git branch -a` — feature branch gone)
