@@ -107,7 +107,7 @@
 
 ## 5. Git Hygiene
 
-- [ ] 5.1 Stage changes with atomic conventional commits:
+- [x] 5.1 Stage changes with atomic conventional commits:
   - `feat: add ContrastPairResult and TokenFoundationOutput Pydantic models`
   - `feat: add ColorPaletteGenerator tool`
   - `feat: add ModularScaleCalculator tool`
@@ -116,15 +116,15 @@
   - `feat: add TokenFoundationAgent (Agent 2) and Task T2`
   - `feat: wire Task T2 into DS Bootstrap Crew task chain`
   - `test: add unit tests for token foundation tools and agent`
-- [ ] 5.2 Ensure no untracked files left behind
-- [ ] 5.3 Rebase on latest `main` if needed
-- [ ] 5.4 Push feature branch
+- [x] 5.2 Ensure no untracked files left behind
+- [x] 5.3 Rebase on latest `main` if needed
+- [x] 5.4 Push feature branch
 
 ## 6. Delivery
 
-- [ ] 6.1 All tasks above are checked
-- [ ] 6.2 Merge feature branch into main (`git checkout main && git merge feat/p04-token-foundation-agent`)
-- [ ] 6.3 Push main (`git push origin main`)
-- [ ] 6.4 Delete local feature branch (`git branch -d feat/p04-token-foundation-agent`)
-- [ ] 6.5 Delete remote feature branch (`git push origin --delete feat/p04-token-foundation-agent`)
-- [ ] 6.6 Verify clean state (`git branch -a` — feature branch gone)
+- [x] 6.1 All tasks above are checked
+- [x] 6.2 Merge feature branch into main (`git checkout main && git merge feat/p04-token-foundation-agent`)
+- [x] 6.3 Push main (`git push origin main`)
+- [x] 6.4 Delete local feature branch (`git branch -d feat/p04-token-foundation-agent`)
+- [x] 6.5 Delete remote feature branch (`git push origin --delete feat/p04-token-foundation-agent`)
+- [x] 6.6 Verify clean state (`git branch -a` — feature branch gone)
