@@ -31,3 +31,6 @@ htmlcov/
 
 # macOS
 .DS_Store
+
+# DAF sandbox (bootstrap.sh output)
+.daf-sandbox/

@@ -147,26 +147,43 @@ stage_generate() {
   ok "Generate complete — enriched profile saved"
 }
 
-# ── Stage: tokens (Agent 2 — Token Foundation) ──────────────────────────────
+# ── Stage: tokens (Agent 2 — Token Foundation via CrewAI) ───────────────────
 stage_tokens() {
   require_profile
-  info "Stage: tokens — Token Foundation Agent (Agent 2)"
+  info "Stage: tokens — Token Foundation Agent (Agent 2) [requires ANTHROPIC_API_KEY]"
+
+  if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
+    info "⚠  ANTHROPIC_API_KEY not set — skipping tokens stage"
+    info "   Set it with: export ANTHROPIC_API_KEY=sk-ant-..."
+    info "   Token generation requires a live LLM call via CrewAI."
+    return 0
+  fi
+
   cd "$WORKDIR"
   uv run --project "$PROJECT_ROOT" python -c "
 import json, sys
 from pathlib import Path
-from daf.models import BrandProfile
-from daf.agents.token_foundation import run_token_foundation
+from daf.agents.brand_discovery import run_ds_bootstrap
 
 profile_path = Path('$WORKDIR/brand-profile.json')
 raw = json.loads(profile_path.read_text())
-profile = BrandProfile(**raw)
 
-result = run_token_foundation(profile, output_dir=Path('$WORKDIR'))
+enriched, token_result = run_ds_bootstrap(raw, output_dir='$WORKDIR')
+
+# Write the enriched profile back
+profile_path.write_text(json.dumps(
+    enriched.model_dump(by_alias=True, mode='json', exclude_none=True),
+    indent=2,
+))
+
 print('Token generation complete.')
-print(f'  Files written: {len(result.files_written)}')
-for f in result.files_written:
-    print(f'    • {f}')
+if token_result:
+    files = getattr(token_result, 'files_written', None) or getattr(token_result, 'written_files', None) or []
+    print(f'  Files written: {len(files)}')
+    for f in files:
+        print(f'    • {f}')
+else:
+    print('  (No structured output returned — check tokens/ directory)')
 "
   ok "Tokens generated"
 }
