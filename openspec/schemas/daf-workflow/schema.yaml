@@ -1,8 +1,8 @@
 name: daf-workflow
 version: 1
 description: |
-  Full DAF development workflow: proposal → specs → design → tdd → tasks → [apply] → verification → [archive].
-  Enforces TDD-first development, git discipline, manual testing, and a strict Definition of Done
+  Full DAF development workflow: proposal → specs → design → tdd → tasks → [apply] → [archive].
+  Enforces TDD-first development, git discipline, and quality gates
   before any change is considered complete.
 
 artifacts:
@@ -63,18 +63,6 @@ artifacts:
       Include git workflow steps and verification gates.
     requires:
       - tdd
-
-  - id: verification
-    generates: verification.md
-    description: Post-implementation Definition of Done checklist — lint, tests, manual QA, git hygiene
-    template: verification.md
-    instruction: |
-      Create the verification checklist to be completed AFTER implementation (/opsx:apply).
-      This is the Definition of Done gate. Cover: test results, lint/type safety,
-      manual testing, git workflow, acceptance criteria sign-off.
-      Nothing ships until every item is checked.
-    requires:
-      - tasks
 
 apply:
   requires: [tasks]

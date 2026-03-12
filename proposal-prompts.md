@@ -48,8 +48,7 @@ For each proposal, run these two steps:
 > 1. `/opsx:propose <name>` — paste the prompt from below, creates the proposal artifact
 > 2. `/opsx:ff <name>` — generates specs, design, tdd, and tasks in one shot
 > 3. `/opsx:apply <name>` — implement the tasks (code gets written)
-> 4. Fill in `verification.md` — check off DoD items
-> 5. `/opsx:archive <name>` — seal the change, merge to main
+> 4. `/opsx:archive <name>` — seal the change, merge to main
 
 ---
 

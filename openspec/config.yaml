@@ -49,10 +49,10 @@ context: |
     CSS references, TypeScript compilation, npm build) + 7 Warning = 15 total checks
   Test failures are Warning (not Fatal) — generated tests may fail despite correct output
 
-  Development workflow: daf-workflow schema (TDD-first, verification-gated)
-    proposal → specs → design → tdd → tasks → [apply] → verification → [archive]
+  Development workflow: daf-workflow schema (TDD-first)
+    proposal → specs → design → tdd → tasks → [apply] → [archive]
     TDD: tests written before implementation, red-green-refactor cycle
-    DoD: zero lint/type errors, all tests pass, manual QA, acceptance criteria met, git hygiene
+    DoD: zero lint/type errors, all tests pass, acceptance criteria met, git hygiene
     Git: feature branches, conventional commits, atomic changes, PR-based delivery
 
   PRD: PRD.md (v1.0.0, March 2026) — always reference for detailed specs
@@ -71,7 +71,7 @@ rules:
     - Component-related specs must specify which scope tier(s) are affected (starter/standard/comprehensive)
     - A11y specs must specify the target level (AA/AAA) and affected WCAG criteria
     - Respect crew I/O contracts defined in PRD §3.6 — never have a crew produce artifacts outside its contract
-    - Every requirement MUST have explicit acceptance criteria (checkboxes) that map to verification
+    - Every requirement MUST have explicit acceptance criteria (checkboxes)
   design:
     - Distinguish between agent logic (LLM-driven) and deterministic tool logic
     - Specify model tier assignment (Tier 1 Opus / Tier 2 Sonnet / Tier 3 Haiku / Deterministic) for new agents
@@ -91,11 +91,4 @@ rules:
     - Include git workflow steps (branch, commit, push)
     - Tag tasks that require changes to crew I/O contracts or pipeline-config.json schema
     - Keep individual tasks completable in one focused session
-    - Final task must be "proceed to verification checklist"
-  verification:
-    - Every acceptance criterion from specs must appear as a checkbox
-    - Manual testing section must include evidence table (scenario, steps, expected, actual, pass/fail)
-    - Zero tolerance for lint errors, type errors, and critical test failures
-    - Git hygiene checks must verify conventional commits and clean branch state
-    - DoD summary table must show pass/fail status for all gates
-    - Nothing archives until all verification items are checked
+    - Final task must include lint, type-check, and full test suite verification

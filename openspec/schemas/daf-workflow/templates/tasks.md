@@ -51,4 +51,3 @@
 ## 6. Ready for Verification
 
 - [ ] 6.1 All tasks above are checked
-- [ ] 6.2 Proceed to verification checklist (verification.md)
