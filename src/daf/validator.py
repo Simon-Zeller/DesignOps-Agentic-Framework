@@ -119,3 +119,96 @@ def validate_profile(data: dict[str, Any]) -> list[str]:
                 )
 
     return errors
+
+
+# ---------------------------------------------------------------------------
+# Theming model validation (p05)
+# ---------------------------------------------------------------------------
+
+_DTCG_ALIAS_RE = re.compile(r"^\{[a-z0-9._-]+\}$")
+_ALIAS_INNER_RE = re.compile(r"^\{([a-z0-9._-]+)\}$")
+
+
+def _walk_tokens(
+    data: dict[str, Any],
+    path: str = "",
+) -> "list[tuple[str, dict[str, Any]]]":
+    """Yield (dot-path, token_dict) for every leaf token in a nested DTCG dict."""
+    results = []
+    for key, val in data.items():
+        current = f"{path}.{key}" if path else key
+        if isinstance(val, dict):
+            if "$value" in val:
+                results.append((current, val))
+            else:
+                results.extend(_walk_tokens(val, current))
+    return results
+
+
+def validate_theme_extensions(
+    semantic_tokens: dict[str, Any],
+    global_tokens: dict[str, str],
+    theme_modes: list[str],
+) -> list[dict[str, Any]]:
+    """Validate $extensions.com.daf.themes blocks in semantic token data.
+
+    Returns a list of structured error dicts:
+        {"token": "<path>", "error": "<description>", "severity": "fatal" | "warning"}
+
+    Rules enforced (per theming-model spec):
+    - Bare $extensions.themes key (without com.daf namespace) → fatal
+    - Values in com.daf.themes that are not alias reference strings → fatal
+    - Alias references in com.daf.themes that do not resolve against global_tokens → fatal
+    """
+    errors: list[dict[str, Any]] = []
+
+    for token_path, token_obj in _walk_tokens(semantic_tokens):
+        extensions = token_obj.get("$extensions", {})
+        if not extensions:
+            continue
+
+        # Rule 1: bare "themes" key is forbidden
+        if "themes" in extensions and "com.daf.themes" not in extensions:
+            errors.append({
+                "token": token_path,
+                "error": (
+                    "Invalid $extensions key 'themes' — must use vendor namespace "
+                    "'com.daf.themes' per W3C DTCG extension requirements"
+                ),
+                "severity": "fatal",
+            })
+            continue  # no point checking further for this token
+
+        # Rule 2 & 3: validate com.daf.themes block if present
+        com_daf_themes = extensions.get("com.daf.themes")
+        if com_daf_themes is None:
+            continue
+
+        for theme_key, theme_value in com_daf_themes.items():
+            # Rule 2: value must be an alias reference string matching {…}
+            if not isinstance(theme_value, str) or not _DTCG_ALIAS_RE.match(theme_value):
+                errors.append({
+                    "token": token_path,
+                    "error": (
+                        f"com.daf.themes['{theme_key}'] value {theme_value!r} is not a valid "
+                        "DTCG alias reference — must match {group.subgroup.step} pattern"
+                    ),
+                    "severity": "fatal",
+                })
+                continue
+
+            # Rule 3: alias must resolve against global token tier
+            inner_match = _ALIAS_INNER_RE.match(theme_value)
+            if inner_match:
+                alias_key = inner_match.group(1)
+                if alias_key not in global_tokens:
+                    errors.append({
+                        "token": token_path,
+                        "error": (
+                            f"com.daf.themes['{theme_key}'] references '{theme_value}' "
+                            f"which does not exist in the global token tier — phantom reference: {alias_key}"
+                        ),
+                        "severity": "fatal",
+                    })
+
+    return errors
