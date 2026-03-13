@@ -67,3 +67,64 @@ def test_directory_is_created_if_absent(tmp_path):
     write_generation_summary(results, str(output_dir))
 
     assert (output_dir / "reports" / "generation-summary.json").exists()
+
+
+# ---------------------------------------------------------------------------
+# ReportWriter BaseTool — governance/quality-gates.json
+# ---------------------------------------------------------------------------
+
+def test_report_writer_tool_writes_file(tmp_path):
+    """ReportWriter._run writes gate results to the given output_path."""
+    from daf.tools.report_writer import ReportWriter
+
+    writer = ReportWriter()
+    gate_results = {
+        "Button": {
+            "coverage_80": True,
+            "a11y_zero_critical": True,
+            "no_phantom_refs": True,
+            "has_docs": True,
+            "has_usage_example": True,
+        },
+        "Input": {
+            "coverage_80": False,
+            "a11y_zero_critical": True,
+            "no_phantom_refs": True,
+            "has_docs": True,
+            "has_usage_example": False,
+        },
+    }
+    out_file = tmp_path / "governance" / "quality-gates.json"
+    writer._run(results=gate_results, output_path=str(out_file))
+
+    assert out_file.exists()
+
+
+def test_report_writer_tool_valid_json(tmp_path):
+    """ReportWriter._run writes valid JSON that can be parsed."""
+    from daf.tools.report_writer import ReportWriter
+
+    writer = ReportWriter()
+    gate_results = {"Card": {"coverage_80": True, "a11y_zero_critical": False}}
+    out_file = tmp_path / "quality-gates.json"
+    writer._run(results=gate_results, output_path=str(out_file))
+
+    data = json.loads(out_file.read_text())
+    assert "Card" in data
+
+
+def test_report_writer_tool_contains_component_names(tmp_path):
+    """ReportWriter._run output JSON contains expected component names."""
+    from daf.tools.report_writer import ReportWriter
+
+    writer = ReportWriter()
+    gate_results = {
+        "Alert": {"coverage_80": True},
+        "Badge": {"coverage_80": False},
+    }
+    out_file = tmp_path / "quality-gates.json"
+    writer._run(results=gate_results, output_path=str(out_file))
+
+    data = json.loads(out_file.read_text())
+    assert "Alert" in data
+    assert "Badge" in data
