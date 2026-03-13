@@ -233,12 +233,12 @@ def _run_phase13_crew(
     factory: Any,
     output_dir: str,
     cm: CheckpointManager,
-    brand_profile: dict | None,
+    brand_profile: dict[str, Any] | None,
     reporter: StatusReporter,
     pre_checkpoint_phase: int,
 ) -> CrewResult:
     """Run a Phase 1–3 crew with cross-phase retry routing (Token Engine path)."""
-    accumulated_rejections: list[dict] = []
+    accumulated_rejections: list[dict[str, Any]] = []
     retries_used = 0
 
     # Create initial checkpoint before Phase 1

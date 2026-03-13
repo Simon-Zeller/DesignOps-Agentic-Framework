@@ -96,7 +96,7 @@ class CheckpointManager(BaseTool):
         }
 
         manifest_path = checkpoints_root / MANIFEST_FILE
-        existing: list[dict] = []
+        existing: list[dict[str, Any]] = []
         if manifest_path.exists():
             try:
                 existing = json.loads(manifest_path.read_text())
@@ -152,7 +152,7 @@ class CheckpointManager(BaseTool):
             return None
 
         try:
-            entries: list[dict] = json.loads(manifest_path.read_text())
+            entries: list[dict[str, Any]] = json.loads(manifest_path.read_text())
         except (json.JSONDecodeError, OSError):
             return None
 
@@ -188,8 +188,7 @@ class CheckpointManager(BaseTool):
             self.cleanup(output_dir=output_dir)
             return "Checkpoints cleaned up."
         if action == "get_last_valid":
-            result = self.get_last_valid_checkpoint(output_dir=output_dir)
-            return json.dumps(result)
+            return json.dumps(self.get_last_valid_checkpoint(output_dir=output_dir))
         raise ValueError(f"Unknown CheckpointManager action: {action!r}")
 
     # ------------------------------------------------------------------
@@ -201,7 +200,7 @@ class CheckpointManager(BaseTool):
         if not manifest_path.exists():
             return None
         try:
-            entries: list[dict] = json.loads(manifest_path.read_text())
+            entries: list[dict[str, Any]] = json.loads(manifest_path.read_text())
         except (json.JSONDecodeError, OSError):
             return None
         for entry in entries:

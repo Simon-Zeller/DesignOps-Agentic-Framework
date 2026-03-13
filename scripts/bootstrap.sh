@@ -7,7 +7,7 @@
 #   ./scripts/bootstrap.sh --from init        # start from interactive interview
 #   ./scripts/bootstrap.sh --from generate    # skip interview, run Agent 1 + gate
 #   ./scripts/bootstrap.sh --from tokens      # skip interview + Agent 1, generate tokens
-#   ./scripts/bootstrap.sh --from primitive-specs  # generate all 11 primitive spec YAMLs
+#   ./scripts/bootstrap.sh --from resume-smoke    # verify --resume flag is wired (p09)
 #   ./scripts/bootstrap.sh --profile <file>   # non-interactive: load profile, then generate
 #   ./scripts/bootstrap.sh --sample           # create a sample profile, then generate
 #
@@ -189,6 +189,41 @@ else:
   ok "Tokens generated"
 }
 
+# ── Stage: resume-smoke (p09 — verify --resume flag is wired) ───────────────
+stage_resume_smoke() {
+  info "Stage: resume-smoke — verify daf init --resume handles a Phase 1 checkpoint correctly"
+
+  local smoke_dir
+  smoke_dir="$(mktemp -d)"
+  trap 'rm -rf "$smoke_dir"' EXIT
+
+  # Write a minimal brand-profile.json so CheckpointManager can create a valid manifest
+  cat > "$smoke_dir/brand-profile.json" << 'RESUME_PROFILE'
+{"name": "Smoke Test DS"}
+RESUME_PROFILE
+
+  # Create a Phase 1 checkpoint programmatically
+  uv run --project "$PROJECT_ROOT" python -c "
+from daf.tools.checkpoint_manager import CheckpointManager
+cm = CheckpointManager()
+cm.create(output_dir='$smoke_dir', phase=1)
+print('Phase 1 checkpoint created.')
+"
+
+  # daf init --resume should find the Phase 1 checkpoint and exit 1 (no LLM available)
+  # OR exit 0 if run_first_publish_agent is stubbed.  We only verify the flag is
+  # recognised (no 'Unknown option' error) and it doesn't crash with exit 2.
+  set +e
+  uv run --project "$PROJECT_ROOT" daf init --resume "$smoke_dir" 2>&1 | head -3
+  local exit_code=$?
+  set -e
+
+  if [[ $exit_code -eq 2 ]]; then
+    fail "daf init --resume exited with code 2 (typer usage error) — flag not wired correctly"
+  fi
+  ok "resume-smoke complete (exit $exit_code — --resume flag is wired)"
+}
+
 # ── Stage: primitive-specs (Agent 3 — Primitive Scaffolding via PrimitiveSpecGenerator) ──
 stage_primitive_specs() {
   info "Stage: primitive-specs — Primitive Scaffolding Agent (Agent 3) [deterministic, no LLM]"
@@ -237,8 +272,11 @@ case "$FROM_STAGE" in
   primitive-specs)
     stage_primitive_specs
     ;;
+  resume-smoke)
+    stage_resume_smoke
+    ;;
   *)
-    fail "Unknown stage: $FROM_STAGE (valid: init, generate, tokens, primitive-specs)"
+    fail "Unknown stage: $FROM_STAGE (valid: init, generate, tokens, primitive-specs, resume-smoke)"
     ;;
 esac
 

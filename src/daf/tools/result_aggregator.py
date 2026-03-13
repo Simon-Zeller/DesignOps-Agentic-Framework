@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from crewai.tools import BaseTool
 from pydantic import Field
@@ -27,7 +27,7 @@ class ResultAggregator(BaseTool):
         )
     )
 
-    def aggregate(self, crew_results: list["CrewResult"], output_dir: str) -> dict:
+    def aggregate(self, crew_results: list["CrewResult"], output_dir: str) -> dict[str, Any]:
         """Write reports/generation-summary.json and return the summary dict.
 
         Raises ValueError if crew_results is empty.
@@ -82,7 +82,7 @@ class ResultAggregator(BaseTool):
         """BaseTool entry point — receives JSON-serialised CrewResult list."""
         from daf.tools.crew_sequencer import CrewResult as CR
 
-        raw: list[dict] = json.loads(crew_results_json)
+        raw: list[dict[str, Any]] = json.loads(crew_results_json)
         results = [
             CR(
                 crew=r["crew"],
