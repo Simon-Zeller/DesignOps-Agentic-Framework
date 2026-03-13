@@ -166,16 +166,16 @@ Implement the `generate_component_specs` function and all spec dict constants.
 
 ## 9. Final Verification & Push
 
-- [ ] 9.1 `git status` — confirm zero untracked files, zero unstaged changes
-- [ ] 9.2 `git log --oneline main..HEAD` — review all commits on this branch
-- [ ] 9.3 Rebase on latest main if needed: `git fetch origin && git rebase origin/main`
-- [ ] 9.4 Push feature branch: `git push origin feat/p07-core-component-specs`
+- [x] 9.1 `git status` — confirm zero untracked files, zero unstaged changes
+- [x] 9.2 `git log --oneline main..HEAD` — review all commits on this branch
+- [x] 9.3 Rebase on latest main if needed: `git fetch origin && git rebase origin/main`
+- [x] 9.4 Push feature branch: `git push origin feat/p07-core-component-specs`
 
 ## 10. Delivery
 
-- [ ] 10.1 All tasks above are checked
-- [ ] 10.2 Merge feature branch into main: `git checkout main && git merge feat/p07-core-component-specs`
-- [ ] 10.3 Push main: `git push origin main`
-- [ ] 10.4 Delete local feature branch: `git branch -d feat/p07-core-component-specs`
-- [ ] 10.5 Delete remote feature branch: `git push origin --delete feat/p07-core-component-specs`
-- [ ] 10.6 Verify clean state: `git branch -a` — feature branch gone, `git status` — clean
+- [x] 10.1 All tasks above are checked
+- [x] 10.2 Merge feature branch into main: `git checkout main && git merge feat/p07-core-component-specs`
+- [x] 10.3 Push main: `git push origin main`
+- [x] 10.4 Delete local feature branch: `git branch -d feat/p07-core-component-specs`
+- [x] 10.5 Delete remote feature branch: `git push origin --delete feat/p07-core-component-specs`
+- [x] 10.6 Verify clean state: `git branch -a` — feature branch gone, `git status` — clean
