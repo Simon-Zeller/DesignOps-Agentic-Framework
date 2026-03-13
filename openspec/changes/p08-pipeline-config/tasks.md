@@ -128,16 +128,16 @@
 
 ## 5. Final Verification & Push
 
-- [ ] 5.1 `git status` — confirm zero untracked files, zero unstaged changes
-- [ ] 5.2 `git log --oneline main..HEAD` — review all commits on this branch
-- [ ] 5.3 Rebase on latest main if needed (`git fetch origin && git rebase origin/main`)
-- [ ] 5.4 Push feature branch (`git push origin feat/p08-pipeline-config`)
+- [x] 5.1 `git status` — confirm zero untracked files, zero unstaged changes
+- [x] 5.2 `git log --oneline main..HEAD` — review all commits on this branch
+- [x] 5.3 Rebase on latest main if needed (`git fetch origin && git rebase origin/main`)
+- [x] 5.4 Push feature branch (`git push origin feat/p08-pipeline-config`)
 
 ## 6. Delivery
 
-- [ ] 6.1 All tasks above are checked
-- [ ] 6.2 Merge feature branch into main (`git checkout main && git merge feat/p08-pipeline-config`)
-- [ ] 6.3 Push main (`git push origin main`)
-- [ ] 6.4 Delete local feature branch (`git branch -d feat/p08-pipeline-config`)
-- [ ] 6.5 Delete remote feature branch (`git push origin --delete feat/p08-pipeline-config`)
-- [ ] 6.6 Verify clean state (`git branch -a` — feature branch gone, `git status` — clean)
+- [x] 6.1 All tasks above are checked
+- [x] 6.2 Merge feature branch into main (`git checkout main && git merge feat/p08-pipeline-config`)
+- [x] 6.3 Push main (`git push origin main`)
+- [x] 6.4 Delete local feature branch (`git branch -d feat/p08-pipeline-config`)
+- [x] 6.5 Delete remote feature branch (`git push origin --delete feat/p08-pipeline-config`)
+- [x] 6.6 Verify clean state (`git branch -a` — feature branch gone, `git status` — clean)
