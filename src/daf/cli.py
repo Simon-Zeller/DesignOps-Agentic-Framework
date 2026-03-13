@@ -9,6 +9,8 @@ import typer
 from daf.validator import validate_profile
 from daf.models import BrandProfile
 from daf.agents.brand_discovery import run_brand_discovery
+from daf.agents.first_publish import run_first_publish_agent
+from daf.tools.checkpoint_manager import CheckpointManager
 
 app = typer.Typer(
     name="daf",
@@ -49,16 +51,28 @@ def init(
         return
 
     if resume is not None:
-        typer.echo(
-            f"[daf] Resume mode: resuming from session '{resume}' "
-            "(resume logic not yet implemented — coming in P08)."
-        )
+        checkpoint = CheckpointManager().get_last_valid_checkpoint(output_dir=resume)
+        if checkpoint is None:
+            typer.echo("No valid checkpoints found")
+            raise typer.Exit(code=1)
+        run_first_publish_agent(resume, start_phase=checkpoint["phase"] + 1)
         return
 
     # Interactive interview
     from daf.interview import run_interview
 
     run_interview(cwd=Path.cwd())
+
+    # Gate 2 — show pipeline results then ask for approval
+    output_dir = str(Path.cwd())
+    run_first_publish_agent(output_dir)
+
+    response = typer.prompt(
+        "A=Approve / R=Re-run / P=Re-run from Phase / C=Re-run Components"
+    )
+    if response.strip().upper() == "A":
+        typer.echo("Design system generation complete")
+        raise typer.Exit(code=0)
 
 
 def _load_profile(profile_path: str) -> None:

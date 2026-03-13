@@ -177,3 +177,52 @@ def _brands_dict(brand_names: list[str], colors: dict[str, str]) -> dict[str, di
             "interactive.primary.background": f"color.primary.{steps[i % len(steps)]}",
         }
     return result
+
+
+# ---------------------------------------------------------------------------
+# Callable wrapper for p09 cross-phase retry routing
+# ---------------------------------------------------------------------------
+
+def run_token_foundation_task(
+    brand_profile: Any,
+    output_dir: str,
+    retry_context: list[dict] | None = None,
+) -> None:
+    """Run the Token Foundation Agent task (used by Agent 6 for cross-phase retries).
+
+    In production this invokes the full Agent 2 pipeline. The *retry_context*
+    argument carries accumulated rejection dicts from prior attempts so the agent
+    can produce materially different output on each retry.
+
+    In tests this function is monkeypatched.
+    """
+    import json
+    from pathlib import Path
+
+    from crewai import Crew
+
+    agent = create_token_foundation_agent()
+
+    # Build the profile object if we received a raw dict
+    if isinstance(brand_profile, dict):
+        from daf.models import BrandProfile as _BP
+        profile_obj = _BP(**brand_profile)
+    else:
+        profile_obj = brand_profile
+
+    retry_suffix = ""
+    if retry_context:
+        retry_suffix = (
+            f"\n\nPREVIOUS REJECTIONS (accumulated context):\n"
+            + json.dumps(retry_context, indent=2)
+        )
+
+    task = create_token_foundation_task(
+        profile=profile_obj,
+        output_dir=output_dir,
+        context_tasks=None,
+    )
+    # Append retry context to description
+    task.description += retry_suffix
+
+    Crew(agents=[agent], tasks=[task]).kickoff()

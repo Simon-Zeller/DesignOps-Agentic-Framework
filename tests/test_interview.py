@@ -30,8 +30,12 @@ def test_full_interview_produces_brand_profile_json(tmp_path, monkeypatch):
     from daf.cli import app
 
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        "daf.cli.run_first_publish_agent",
+        lambda od, **kw: {"pipeline": {"status": "success"}, "phase_results": []},
+    )
     runner = CliRunner(mix_stderr=False)
-    result = runner.invoke(app, ["init"], input=_FULL_INTERVIEW_INPUT)
+    result = runner.invoke(app, ["init"], input=_FULL_INTERVIEW_INPUT + "A\n")
 
     assert result.exit_code == 0, f"Unexpected exit: {result.output}"
     assert (tmp_path / "brand-profile.json").exists()
@@ -99,8 +103,12 @@ def test_full_interview_exit_code_zero(tmp_path, monkeypatch):
     from daf.cli import app
 
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        "daf.cli.run_first_publish_agent",
+        lambda od, **kw: {"pipeline": {"status": "success"}, "phase_results": []},
+    )
     runner = CliRunner(mix_stderr=False)
-    result = runner.invoke(app, ["init"], input=_FULL_INTERVIEW_INPUT)
+    result = runner.invoke(app, ["init"], input=_FULL_INTERVIEW_INPUT + "A\n")
 
     assert result.exit_code == 0
     assert "brand-profile.json" in result.output
@@ -114,8 +122,12 @@ def test_full_interview_overwrites_existing_profile(tmp_path, monkeypatch):
     (tmp_path / "brand-profile.json").write_text(json.dumps({"name": "Old"}))
 
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        "daf.cli.run_first_publish_agent",
+        lambda od, **kw: {"pipeline": {"status": "success"}, "phase_results": []},
+    )
     runner = CliRunner(mix_stderr=False)
-    result = runner.invoke(app, ["init"], input=_FULL_INTERVIEW_INPUT)
+    result = runner.invoke(app, ["init"], input=_FULL_INTERVIEW_INPUT + "A\n")
 
     assert result.exit_code == 0
     data = json.loads((tmp_path / "brand-profile.json").read_text())
@@ -225,8 +237,12 @@ def test_session_resume_continues_from_last_step(tmp_path, monkeypatch):
     )
 
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        "daf.cli.run_first_publish_agent",
+        lambda od, **kw: {"pipeline": {"status": "success"}, "phase_results": []},
+    )
     runner = CliRunner(mix_stderr=False)
-    result = runner.invoke(app, ["init"], input=_RESUME_INPUT)
+    result = runner.invoke(app, ["init"], input=_RESUME_INPUT + "A\n")
 
     assert result.exit_code == 0, f"Unexpected exit: {result.output}"
     data = json.loads((tmp_path / "brand-profile.json").read_text())
@@ -247,8 +263,12 @@ def test_session_start_over_clears_previous_answers(tmp_path, monkeypatch):
     start_over_input = "n\n" + _FULL_INTERVIEW_INPUT
 
     monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        "daf.cli.run_first_publish_agent",
+        lambda od, **kw: {"pipeline": {"status": "success"}, "phase_results": []},
+    )
     runner = CliRunner(mix_stderr=False)
-    result = runner.invoke(app, ["init"], input=start_over_input)
+    result = runner.invoke(app, ["init"], input=start_over_input + "A\n")
 
     assert result.exit_code == 0, f"Unexpected exit: {result.output}"
     data = json.loads((tmp_path / "brand-profile.json").read_text())

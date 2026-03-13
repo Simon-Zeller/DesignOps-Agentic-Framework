@@ -16,13 +16,23 @@ _FULL_INTERVIEW_INPUT = "My Design System\n1\n" + "\n" * 17
 def test_init_interactive_exits_zero(tmp_path, monkeypatch):
     """Full interactive interview completes successfully with simulated input."""
     monkeypatch.chdir(tmp_path)
-    result = runner.invoke(app, ["init"], input=_FULL_INTERVIEW_INPUT)
+    monkeypatch.setattr(
+        "daf.cli.run_first_publish_agent",
+        lambda od, **kw: {"pipeline": {"status": "success"}, "phase_results": []},
+    )
+    # Interview inputs + Gate 2 approval
+    full_input = _FULL_INTERVIEW_INPUT + "A\n"
+    result = runner.invoke(app, ["init"], input=full_input)
     assert result.exit_code == 0, f"Unexpected exit: {result.output}"
 
 
 def test_init_resume_flag_exits_zero():
+    # --resume with a path that has no checkpoints now exits 1 (p09 behavior)
     result = runner.invoke(app, ["init", "--resume", "./output-dir"])
-    assert result.exit_code == 0
+    assert result.exit_code == 1, (
+        "Expected exit 1 when resuming from a path with no valid checkpoints"
+    )
+    assert "No valid checkpoints found" in result.output
 
 
 def test_init_unknown_flag_nonzero_exit():
