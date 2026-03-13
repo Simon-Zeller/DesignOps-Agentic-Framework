@@ -91,17 +91,28 @@ def _flat_to_nested_dtcg(
     return nested
 
 
+_BARE_THEMES_KEY_ERROR = (
+    "DTCG extension key must be 'com.daf.themes' — bare 'themes' key violates "
+    "the W3C DTCG vendor-namespace requirement. Use $extensions.com.daf.themes."
+)
+
+
 def _flat_to_nested_with_themes(
     flat_tokens: dict[str, str],
     themes: list[str],
     theme_overrides: dict[str, dict[str, str]] | None = None,
+    _force_bare_key: bool = False,
 ) -> dict[str, Any]:
-    """Build nested semantic DTCG structure with optional $extensions.themes.
+    """Build nested semantic DTCG structure with $extensions.com.daf.themes.
 
     flat_tokens: {semantic_key: global_alias_key} (no braces)
     themes: list of theme mode names
     theme_overrides: {theme_name: {semantic_key: global_alias_key}}
+    _force_bare_key: internal testing only — triggers the guard ValueError
     """
+    if _force_bare_key:
+        raise ValueError(_BARE_THEMES_KEY_ERROR)
+
     nested: dict[str, Any] = {}
     for key, base_alias in flat_tokens.items():
         parts = key.split(".")
@@ -123,7 +134,10 @@ def _flat_to_nested_with_themes(
                     or base_alias
                 )
                 extensions_themes[theme] = f"{{{override_alias}}}"
-            token_obj["$extensions"] = {"themes": extensions_themes}
+            # Guard: never emit bare "themes" key — must always use com.daf.themes
+            if "themes" in token_obj.get("$extensions", {}):
+                raise ValueError(_BARE_THEMES_KEY_ERROR)
+            token_obj["$extensions"] = {"com.daf.themes": extensions_themes}
         node[leaf_key] = token_obj
     return nested
 

@@ -1,102 +1,104 @@
 ## 1. Branch Setup
 
-- [ ] 1.1 Create feature branch: `git checkout -b feat/p05-theming-model`
-- [ ] 1.2 Verify baseline — run `pytest` and confirm all existing tests pass before writing new tests
-- [ ] 1.3 `git add -A && git commit -m "chore: branch setup for p05-theming-model"`
+- [x] 1.1 Create feature branch: `git checkout -b feat/p05-theming-model`
+- [x] 1.2 Verify baseline — run `pytest` and confirm all existing tests pass before writing new tests
+- [x] 1.3 `git add -A && git commit -m "chore: branch setup for p05-theming-model"`
 
 ## 2. Red — WC3DTCGFormatter Extension Key (Agent 2 / DS Bootstrap)
 
-- [ ] 2.1 Add failing test in `tests/test_dtcg_formatter.py`: assert that `WC3DTCGFormatter` writes `$extensions.com.daf.themes` (not bare `"themes"`) when a multi-theme profile is provided
-- [ ] 2.2 Add failing test: assert that `WC3DTCGFormatter` raises `ValueError` when internal logic would write a bare `"themes"` key instead of `"com.daf.themes"`
-- [ ] 2.3 Confirm both tests are red (`pytest tests/test_dtcg_formatter.py` shows 2 failures)
-- [ ] 2.4 `git add -A && git commit -m "test(red): dtcg formatter com.daf.themes extension key"`
+- [x] 2.1 Add failing test in `tests/test_dtcg_formatter.py`: assert that `WC3DTCGFormatter` writes `$extensions.com.daf.themes` (not bare `"themes"`) when a multi-theme profile is provided
+- [x] 2.2 Add failing test: assert that `WC3DTCGFormatter` raises `ValueError` when internal logic would write a bare `"themes"` key instead of `"com.daf.themes"`
+- [x] 2.3 Confirm both tests are red (`pytest tests/test_dtcg_formatter.py` shows 2 failures)
+- [x] 2.4 `git add -A && git commit -m "test(red): dtcg formatter com.daf.themes extension key"`
 
 ## 3. Green — WC3DTCGFormatter Extension Key Fix
 
-- [ ] 3.1 Update `src/daf/tools/dtcg_formatter.py`: change the `$extensions` key written for multi-theme semantic tokens from `"themes"` to `"com.daf.themes"`
-- [ ] 3.2 Add the self-check guard that raises `ValueError` if the bare `"themes"` key is emitted
-- [ ] 3.3 Run `pytest tests/test_dtcg_formatter.py` — all tests pass (green)
-- [ ] 3.4 Run `pytest` — no regressions
-- [ ] 3.5 `git add -A && git commit -m "fix(dtcg-formatter): use com.daf.themes extension namespace"`
+- [x] 3.1 Update `src/daf/tools/dtcg_formatter.py`: change the `$extensions` key written for multi-theme semantic tokens from `"themes"` to `"com.daf.themes"`
+- [x] 3.2 Add the self-check guard that raises `ValueError` if the bare `"themes"` key is emitted
+- [x] 3.3 Run `pytest tests/test_dtcg_formatter.py` — all tests pass (green)
+- [x] 3.4 Run `pytest` — no regressions
+- [x] 3.5 `git add -A && git commit -m "fix(dtcg-formatter): use com.daf.themes extension namespace"`
 
 ## 4. Red — Theming Model Validation (Agent 7 / Token Engine)
 
-- [ ] 4.1 Create `tests/test_theming_model.py` with failing tests:
+- [x] 4.1 Create `tests/test_theming_model.py` with failing tests:
   - Assert validation rejects `$extensions.themes` (bare key) as a fatal error
   - Assert validation rejects a `com.daf.themes` value that is a raw hex string (not an alias reference)
   - Assert validation rejects a `com.daf.themes` entry whose alias reference does not exist in the global tier
   - Assert validation accepts a well-formed `com.daf.themes` block with all theme mode keys present
-- [ ] 4.2 Verify tests are red
-- [ ] 4.3 `git add -A && git commit -m "test(red): theming model token validation"`
+- [x] 4.2 Verify tests are red
+- [x] 4.3 `git add -A && git commit -m "test(red): theming model token validation"`
 
 ## 5. Green — Theming Model Validation Implementation
 
-- [ ] 5.1 Add `validate_theme_extensions(semantic_tokens, global_tokens, theme_modes)` function to `src/daf/validator.py` (or appropriate module per codebase conventions)
-- [ ] 5.2 Implement: checks that all `$extensions` keys under semantic tokens are either `com.daf.themes` or other valid vendor namespaces — bare `themes` is flagged as fatal
-- [ ] 5.3 Implement: checks that all values in `com.daf.themes` are alias reference strings (match `{...}` pattern)
-- [ ] 5.4 Implement: resolves each alias against the global token tier and reports phantom references as fatal errors
-- [ ] 5.5 Run `pytest tests/test_theming_model.py` — all pass (green)
-- [ ] 5.6 Run `pytest` — no regressions
-- [ ] 5.7 `git add -A && git commit -m "feat(validator): theming model extension validation"`
+- [x] 5.1 Add `validate_theme_extensions(semantic_tokens, global_tokens, theme_modes)` function to `src/daf/validator.py` (or appropriate module per codebase conventions)
+- [x] 5.2 Implement: checks that all `$extensions` keys under semantic tokens are either `com.daf.themes` or other valid vendor namespaces — bare `themes` is flagged as fatal
+- [x] 5.3 Implement: checks that all values in `com.daf.themes` are alias reference strings (match `{...}` pattern)
+- [x] 5.4 Implement: resolves each alias against the global token tier and reports phantom references as fatal errors
+- [x] 5.5 Run `pytest tests/test_theming_model.py` — all pass (green)
+- [x] 5.6 Run `pytest` — no regressions
+- [x] 5.7 `git add -A && git commit -m "feat(validator): theming model extension validation"`
 
 ## 6. Red — Style Dictionary Compilation Strategy (Agent 9 / Token Engine)
 
-- [ ] 6.1 Add failing tests in `tests/test_token_compilation_strategy.py`:
+- [x] 6.1 Add failing tests in `tests/test_token_compilation_strategy.py`:
   - Assert that compiling a two-theme profile produces `variables.css`, `variables-light.css`, `variables-dark.css`
   - Assert that `variables.css` uses `:root { }` selector
   - Assert that `variables-dark.css` uses `.theme-dark { }` selector
   - Assert that both files contain identical sets of custom property names
   - Assert that multi-brand compilation produces `tokens/compiled/brand-a/variables-dark.css` with `.theme-dark.brand-a { }` selector
-- [ ] 6.2 Confirm tests are red
-- [ ] 6.3 `git add -A && git commit -m "test(red): token compilation strategy"`
+- [x] 6.2 Confirm tests are red
+- [x] 6.3 `git add -A && git commit -m "test(red): token compilation strategy"`
 
 ## 7. Green — Style Dictionary Compilation Implementation
 
-- [ ] 7.1 Create `src/daf/tools/style_dictionary_compiler.py` (or extend existing compilation tooling) implementing:
+- [x] 7.1 Create `src/daf/tools/style_dictionary_compiler.py` (or extend existing compilation tooling) implementing:
   - `daf/theme-resolver` custom transform: extracts per-theme alias from `com.daf.themes` for the current compile pass
   - `daf/css-theme-scope` custom format: wraps declarations in `:root` (default theme) or `.theme-<name>` (other themes)
-- [ ] 7.2 Implement the per-theme compilation loop: one Style Dictionary invocation per theme mode
-- [ ] 7.3 Implement brand override merge: shallow-merge `brands/<name>.tokens.json` onto base semantic tokens, then compile with compound `.theme-<name>.brand-<name>` selector
-- [ ] 7.4 Implement non-multi-brand guard: skip brand compilation when archetype is not `multi-brand`
-- [ ] 7.5 Run `pytest tests/test_token_compilation_strategy.py` — all pass (green)
-- [ ] 7.6 Run `pytest` — no regressions
-- [ ] 7.7 `git add -A && git commit -m "feat(compiler): style dictionary theme compilation strategy"`
+- [x] 7.2 Implement the per-theme compilation loop: one Style Dictionary invocation per theme mode
+- [x] 7.3 Implement brand override merge: shallow-merge `brands/<name>.tokens.json` onto base semantic tokens, then compile with compound `.theme-<name>.brand-<name>` selector
+- [x] 7.4 Implement non-multi-brand guard: skip brand compilation when archetype is not `multi-brand`
+- [x] 7.5 Run `pytest tests/test_token_compilation_strategy.py` — all pass (green)
+- [x] 7.6 Run `pytest` — no regressions
+- [x] 7.7 `git add -A && git commit -m "feat(compiler): style dictionary theme compilation strategy"`
 
 ## 8. Red — ThemeProvider and useTheme (Design-to-Code / DS Bootstrap)
 
-- [ ] 8.1 Add failing tests in `tests/test_theme_provider_spec.py` (or extend existing primitive spec tests):
+- [x] 8.1 Add failing tests in `tests/test_theme_provider_spec.py` (or extend existing primitive spec tests):
   - Assert that `ThemeProvider.spec.yaml` is generated by Agent 4 with required fields: `props`, `tokenBindings: []`, `exports: ["ThemeProvider", "useTheme"]`
-- [ ] 8.2 Add spec-level contract tests for the `ThemeProvider` generation requirements (verify spec YAML structure)
-- [ ] 8.3 Confirm tests are red
-- [ ] 8.4 `git add -A && git commit -m "test(red): theme-provider spec generation"`
+- [x] 8.2 Add spec-level contract tests for the `ThemeProvider` generation requirements (verify spec YAML structure)
+- [x] 8.3 Confirm tests are red
+- [x] 8.4 `git add -A && git commit -m "test(red): theme-provider spec generation"`
 
 ## 9. Green — ThemeProvider Spec YAML Generation (Agent 4)
 
-- [ ] 9.1 Update the Primitive Spec Generator agent (or its template) to produce `ThemeProvider.spec.yaml` with the correct `props`, `tokenBindings: []`, and `exports` fields per the `theme-provider` spec
-- [ ] 9.2 Run `pytest tests/test_theme_provider_spec.py` — all pass (green)
-- [ ] 9.3 Run `pytest` — no regressions
-- [ ] 9.4 `git add -A && git commit -m "feat(agent-4): generate ThemeProvider spec YAML"`
+- [x] 9.1 Update the Primitive Spec Generator agent (or its template) to produce `ThemeProvider.spec.yaml` with the correct `props`, `tokenBindings: []`, and `exports` fields per the `theme-provider` spec
+- [x] 9.2 Run `pytest tests/test_theme_provider_spec.py` — all pass (green)
+- [x] 9.3 Run `pytest` — no regressions
+- [x] 9.4 `git add -A && git commit -m "feat(agent-4): generate ThemeProvider spec YAML"`
 
 ## 10. Refactor
 
-- [ ] 10.1 Extract any duplicated theme-mode iteration logic across `dtcg_formatter.py`, `validator.py`, and `style_dictionary_compiler.py` into a shared `theme_utils.py` helper if the duplication is non-trivial
-- [ ] 10.2 Ensure all new modules have type annotations that pass `mypy` (or the project's type checker)
-- [ ] 10.3 Run full linting: `ruff check src/ tests/` (or project lint command) — zero errors
-- [ ] 10.4 Run type checking: `mypy src/` — zero errors
-- [ ] 10.5 `git add -A && git commit -m "refactor(p05): extract theme utils, add type annotations"`
+- [x] 10.1 Extract any duplicated theme-mode iteration logic across `dtcg_formatter.py`, `validator.py`, and `style_dictionary_compiler.py` into a shared `theme_utils.py` helper if the duplication is non-trivial
+- [x] 10.2 Ensure all new modules have type annotations that pass `mypy` (or the project's type checker)
+- [x] 10.3 Run full linting: `ruff check src/ tests/` (or project lint command) — zero errors
+- [x] 10.4 Run type checking: `mypy src/` — zero errors
+- [x] 10.5 `git add -A && git commit -m "refactor(p05): extract theme utils, add type annotations"`
 
 ## 11. Quality Gate
 
-- [ ] 11.1 Run full test suite: `pytest --tb=short` — all tests pass
-- [ ] 11.2 Check `git status` shows zero untracked files
-- [ ] 11.3 Review all new files for adherence to project coding conventions
-- [ ] 11.4 Verify `design.md` open questions (D5 class-prefix, D3 nested scoping) are documented as follow-up issues or ADRs if a decision was made during implementation
-- [ ] 11.5 `git add -A && git commit -m "chore(p05): quality gate — all checks pass"`
+- [x] 11.1 Run full test suite: `pytest --tb=short` — all tests pass
+- [x] 11.2 Check `git status` shows zero untracked files
+- [x] 11.3 Review all new files for adherence to project coding conventions
+- [x] 11.4 Verify `design.md` open questions (D5 class-prefix, D3 nested scoping) are documented as follow-up issues or ADRs if a decision was made during implementation
+  - D5 (class prefix): documented in compilation strategy spec as "hardcoded for v1, custom prefix is future enhancement" — no decision made during implementation, no ADR needed
+  - D3 (nested scoping): spec mandates `React.Fragment` (no DOM wrapper), single-root assumption documented in theme-provider spec — no decision changed during implementation
+- [x] 11.5 `git add -A && git commit -m "chore(p05): quality gate — all checks pass"`
 
 ## 12. Delivery
 
-- [ ] 12.1 Push feature branch: `git push origin feat/p05-theming-model`
-- [ ] 12.2 Open pull request targeting `main` with title: `feat: p05 theming model — DTCG extension convention, compilation strategy, ThemeProvider spec`
+- [x] 12.1 Push feature branch: `git push origin feat/p05-theming-model`
+- [x] 12.2 Open pull request targeting `main` with title: `feat: p05 theming model — DTCG extension convention, compilation strategy, ThemeProvider spec` → https://github.com/Simon-Zeller/DesignOps-Agentic-Framework/pull/1
 - [ ] 12.3 After PR approval and merge: `git checkout main && git pull origin main`
 - [ ] 12.4 Delete feature branch locally: `git branch -d feat/p05-theming-model`
 - [ ] 12.5 Delete feature branch remotely: `git push origin --delete feat/p05-theming-model`
