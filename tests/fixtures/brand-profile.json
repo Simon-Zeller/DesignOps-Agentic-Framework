@@ -1,6 +1,8 @@
 {
+  "archetype": "minimalist",
   "brand": "Acme Design System",
   "a11y_level": "AA",
+  "modular_scale": 1.25,
   "color_mode": "light",
   "typography": {
     "base_size": 16,
