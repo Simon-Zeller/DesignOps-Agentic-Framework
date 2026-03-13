@@ -1,0 +1,28 @@
+component: Button
+description: Interactive button component with multiple variants and interactive states.
+variants:
+  - primary
+  - secondary
+states:
+  - default
+  - hover
+  - active
+  - disabled
+  - focus
+composedOf:
+  - Box
+tokens:
+  background: color.interactive.default
+  foreground: color.interactive.foreground
+  borderRadius: radius.md
+  paddingX: space.4
+  paddingY: space.2
+  fontSize: typography.body.size
+layout:
+  type: flex
+  direction: row
+  align: center
+  justify: center
+a11y:
+  role: button
+  label: true

@@ -1,0 +1,14 @@
+component: Box
+description: Primitive layout container — flex or grid wrapper with spacing props.
+variants: []
+states: []
+composedOf: []
+tokens:
+  padding: space.4
+  background: color.surface.default
+layout:
+  type: flex
+  direction: row
+  align: stretch
+a11y:
+  role: generic
