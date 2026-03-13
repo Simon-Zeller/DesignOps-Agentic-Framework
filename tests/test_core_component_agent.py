@@ -22,7 +22,7 @@ def test_core_component_spec_generator_is_base_tool_subclass() -> None:
 
 
 def test_core_component_spec_generator_name() -> None:
-    assert CoreComponentSpecGenerator.name == "CoreComponentSpecGenerator"
+    assert CoreComponentSpecGenerator().name == "CoreComponentSpecGenerator"
 
 
 def test_tool_run_produces_starter_files(tmp_path) -> None:

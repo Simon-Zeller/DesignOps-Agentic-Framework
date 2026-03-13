@@ -13,6 +13,10 @@ from daf.agents.primitive_scaffolding import (
     create_primitive_scaffolding_agent,
     create_primitive_scaffolding_task,
 )
+from daf.agents.core_component import (
+    create_core_component_agent,
+    create_core_component_task,
+)
 
 __all__ = [
     "create_brand_discovery_agent",
@@ -23,4 +27,6 @@ __all__ = [
     "create_token_foundation_task",
     "create_primitive_scaffolding_agent",
     "create_primitive_scaffolding_task",
+    "create_core_component_agent",
+    "create_core_component_task",
 ]
