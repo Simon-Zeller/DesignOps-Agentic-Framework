@@ -97,15 +97,12 @@ write_sample_profile() {
   "colors": {
     "primary": "#1a73e8",
     "secondary": "#34a853",
-    "neutral": "#5f6368",
-    "success": "#34a853",
-    "warning": "#f9ab00",
-    "error": "#ea4335",
-    "info": "#4285f4"
+    "neutral": "#5f6368"
   },
   "typography": {
-    "fontFamily": "Inter",
-    "headingFontFamily": "Inter",
+    "headingFont": "Inter",
+    "bodyFont": "Inter",
+    "monoFont": "Roboto Mono",
     "scaleRatio": 1.25,
     "baseSize": 16
   },
@@ -113,18 +110,16 @@ write_sample_profile() {
     "baseUnit": 8,
     "density": "default"
   },
-  "borderRadius": "md",
+  "borderRadius": "moderate",
   "elevation": "subtle",
-  "motion": "default",
+  "motion": "standard",
   "themes": {
-    "modes": ["light", "dark"],
-    "default": "light"
+    "modes": ["light", "dark"]
   },
   "accessibility": "AA",
   "componentScope": "standard",
   "breakpoints": {
-    "strategy": "mobile-first",
-    "values": [640, 768, 1024, 1280]
+    "strategy": "mobile-first"
   }
 }
 SAMPLE_JSON

@@ -1,9 +1,9 @@
-"""PrimitiveSpecGenerator — generates all 9 primitive spec YAMLs.
+"""PrimitiveSpecGenerator — generates all 11 primitive spec YAMLs.
 
 Agent 3 (Primitive Scaffolding Agent) in the DS Bootstrap Crew uses this
-module to produce canonical specs/*.spec.yaml files for all 9 composition
+module to produce canonical specs/*.spec.yaml files for all 11 composition
 primitives: Box, Stack, HStack, VStack, Grid, Text, Icon, Pressable, Divider,
-Spacer, and ThemeProvider (11 files total).
+Spacer, and ThemeProvider.
 
 Per the primitive-spec-generation spec (p06):
   - All specs must include: component, description, props, tokenBindings,
@@ -717,8 +717,8 @@ class PrimitiveSpecGenerator(BaseTool):
     """CrewAI tool that generates all 11 primitive spec YAMLs in one call.
 
     Agent 3 (Primitive Scaffolding Agent) uses this tool to fulfill Task T3:
-    write canonical specs/*.spec.yaml files for all 9 composition primitives
-    plus ThemeProvider. The tool is fully deterministic — no LLM calls.
+    write canonical specs/*.spec.yaml files for all 11 composition primitives.
+    The tool is fully deterministic — no LLM calls.
     """
 
     name: str = "PrimitiveSpecGenerator"
