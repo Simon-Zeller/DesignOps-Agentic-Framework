@@ -1,0 +1,24 @@
+{
+  "Button.tsx": {
+    "lines": {
+      "total": 40,
+      "covered": 38,
+      "pct": 95.0
+    },
+    "functions": {
+      "total": 2,
+      "covered": 2,
+      "pct": 100.0
+    },
+    "branches": {
+      "total": 4,
+      "covered": 3,
+      "pct": 75.0
+    },
+    "statements": {
+      "total": 40,
+      "covered": 38,
+      "pct": 95.0
+    }
+  }
+}

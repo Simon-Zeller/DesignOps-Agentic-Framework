@@ -1,0 +1,24 @@
+component: Toggle
+description: Toggle component with an impossible state machine (terminal state has outgoing transition).
+variants:
+  - default
+states:
+  default:
+    transitions:
+      - active
+  active:
+    transitions:
+      - disabled
+  disabled:
+    terminal: true
+    transitions:
+      - active
+composedOf:
+  - Pressable
+  - Text
+tokens:
+  background: color.interactive.default
+  foreground: color.interactive.foreground
+a11y:
+  role: button
+  label: true

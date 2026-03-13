@@ -66,3 +66,15 @@ __all__ = [
     "create_token_diff_agent",
     "create_token_diff_task",
 ]
+
+from daf.agents.spec_validation import run_spec_validation
+from daf.agents.composition import run_composition_check
+from daf.agents.accessibility import run_accessibility_enforcement
+from daf.agents.quality_scoring import run_quality_scoring
+
+__all__ += [
+    "run_spec_validation",
+    "run_composition_check",
+    "run_accessibility_enforcement",
+    "run_quality_scoring",
+]
