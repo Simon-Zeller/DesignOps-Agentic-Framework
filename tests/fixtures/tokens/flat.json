@@ -1,0 +1,22 @@
+{
+  "color.interactive.default": "#005FCC",
+  "color.interactive.foreground": "#FFFFFF",
+  "color.interactive.hover": "#004FAD",
+  "color.interactive.active": "#003D8A",
+  "color.interactive.disabled": "#99BBDD",
+  "color.surface.default": "#FFFFFF",
+  "color.surface.subtle": "#F5F7FA",
+  "space.1": "4px",
+  "space.2": "8px",
+  "space.3": "12px",
+  "space.4": "16px",
+  "space.6": "24px",
+  "space.8": "32px",
+  "radius.sm": "4px",
+  "radius.md": "8px",
+  "radius.lg": "16px",
+  "typography.body.size": "14px",
+  "typography.body.weight": "400",
+  "typography.heading.size": "24px",
+  "typography.heading.weight": "700"
+}
