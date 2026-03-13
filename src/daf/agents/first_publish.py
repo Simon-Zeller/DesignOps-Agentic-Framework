@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -46,6 +47,29 @@ MAX_PHASE46_RETRIES = 2   # Phases 4–6 crews get 2 attempts
 _CRITICAL_PHASE_CREWS = {"token_engine", "design_to_code", "component_factory"}
 
 _HAIKU_MODEL = "claude-3-5-haiku-20241022"
+
+# Maps each crew name to its canonical pipeline phase integer.
+_CREW_PHASE_MAP: dict[str, int] = {
+    "token_engine": 1,
+    "design_to_code": 2,
+    "component_factory": 2,
+    "documentation": 4,
+    "governance": 4,
+    "ai_semantic_layer": 5,
+    "analytics": 5,
+    "release": 6,
+}
+
+# Maps phase numbers to the output subdirectory / file paths they produce.
+# Used by _cascade_invalidate to wipe phase-boundary artifacts after a rollback.
+_PHASE_ARTIFACT_DIRS: dict[int, list[str]] = {
+    1: ["tokens"],
+    2: ["src/components"],
+    3: ["src/components", "src/primitives"],
+    4: ["docs"],
+    5: ["reports/analytics", "reports/semantic"],
+    6: ["package.json", "src/index.ts"],
+}
 
 def create_first_publish_agent() -> Agent:
     """Instantiate Agent 6: First Publish Agent (Tier 2 — Claude Sonnet)."""
@@ -129,6 +153,8 @@ def run_first_publish_agent(
             factory=create_design_to_code_crew,
             output_dir=output_dir,
             reporter=reporter,
+            cm=cm,
+            phase=_CREW_PHASE_MAP["design_to_code"],
         )
         results.append(d2c_result)
     else:
@@ -141,6 +167,8 @@ def run_first_publish_agent(
             factory=create_component_factory_crew,
             output_dir=output_dir,
             reporter=reporter,
+            cm=cm,
+            phase=_CREW_PHASE_MAP["component_factory"],
         )
         results.append(cf_result)
         # Phase 3 checkpoint
@@ -156,6 +184,8 @@ def run_first_publish_agent(
             output_dir=output_dir,
             max_retries=MAX_PHASE46_RETRIES,
             reporter=reporter,
+            cm=cm,
+            phase=_CREW_PHASE_MAP["documentation"],
         )
         results.append(doc_result)
 
@@ -165,6 +195,8 @@ def run_first_publish_agent(
             output_dir=output_dir,
             max_retries=MAX_PHASE46_RETRIES,
             reporter=reporter,
+            cm=cm,
+            phase=_CREW_PHASE_MAP["governance"],
         )
         results.append(gov_result)
         # Phase 4 checkpoint
@@ -181,6 +213,8 @@ def run_first_publish_agent(
             output_dir=output_dir,
             max_retries=MAX_PHASE46_RETRIES,
             reporter=reporter,
+            cm=cm,
+            phase=_CREW_PHASE_MAP["ai_semantic_layer"],
         )
         results.append(ai_result)
 
@@ -190,6 +224,8 @@ def run_first_publish_agent(
             output_dir=output_dir,
             max_retries=MAX_PHASE46_RETRIES,
             reporter=reporter,
+            cm=cm,
+            phase=_CREW_PHASE_MAP["analytics"],
         )
         results.append(analytics_result)
         # Phase 5 checkpoint
@@ -206,6 +242,8 @@ def run_first_publish_agent(
             output_dir=output_dir,
             max_retries=MAX_PHASE46_RETRIES,
             reporter=reporter,
+            cm=cm,
+            phase=_CREW_PHASE_MAP["release"],
         )
         results.append(release_result)
     else:
@@ -266,6 +304,7 @@ def _run_phase13_crew(
                 reporter.phase_retry(crew=crew_name, phase=1, attempt=attempt)
                 # Restore the pre-Phase checkpoint
                 cm.restore(output_dir=output_dir, phase=pre_checkpoint_phase)
+                _cascade_invalidate(output_dir, pre_checkpoint_phase)
                 # Re-run origin task with accumulated context
                 run_token_foundation_task(
                     brand_profile,
@@ -307,8 +346,11 @@ def _run_simple_crew(
     factory: Any,
     output_dir: str,
     reporter: StatusReporter,
+    cm: CheckpointManager,
+    phase: int,
 ) -> CrewResult:
     """Run a Phase 2–3 crew once (no retry)."""
+    cm.create(output_dir=output_dir, phase=phase)
     reporter.phase_start(crew=crew_name, phase=2)
     crew = factory(output_dir=output_dir)
     raw_result = crew.kickoff()
@@ -323,10 +365,18 @@ def _run_with_retry(
     output_dir: str,
     max_retries: int,
     reporter: StatusReporter,
+    cm: CheckpointManager,
+    phase: int,
 ) -> CrewResult:
     """Run a Phase 4–6 crew with a bounded retry (non-fatal on exhaustion)."""
     retries_used = 0
     for attempt in range(1, max_retries + 1):
+        if attempt == 1:
+            cm.create(output_dir=output_dir, phase=phase)
+        else:
+            cm.restore(output_dir=output_dir, phase=phase)
+            _cascade_invalidate(output_dir, phase)
+
         reporter.phase_start(crew=crew_name, phase=4)
         crew = factory(output_dir=output_dir)
         raw_result = crew.kickoff()
@@ -352,6 +402,29 @@ def _run_with_retry(
 
     # Should not be reachable
     return CrewResult(crew=crew_name, status="failed", retries_used=retries_used)
+
+
+def _cascade_invalidate(output_dir: str, from_phase: int) -> None:
+    """Remove all phase-boundary artifacts produced by phases > from_phase.
+
+    Enforces the cascade-forward invariant (§3.4): after restoring a checkpoint
+    at ``from_phase``, any artifacts written by later phases are stale and must
+    be deleted so that restarted crews start from a clean slate.
+
+    Only paths listed in ``_PHASE_ARTIFACT_DIRS`` are touched; the
+    ``.daf-checkpoints/`` directory is never removed. Missing paths are silently
+    skipped, making the function idempotent.
+    """
+    base = Path(output_dir)
+    for phase, paths in _PHASE_ARTIFACT_DIRS.items():
+        if phase > from_phase:
+            for rel_path in paths:
+                target = base / rel_path
+                if target.is_dir():
+                    shutil.rmtree(str(target))
+                elif target.is_file():
+                    target.unlink()
+                # else: not present — silently skip
 
 
 def _normalise_result(raw: Any, crew_name: str) -> CrewResult:

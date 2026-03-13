@@ -10,7 +10,7 @@ from daf.validator import validate_profile
 from daf.models import BrandProfile
 from daf.agents.brand_discovery import run_brand_discovery
 from daf.agents.first_publish import run_first_publish_agent
-from daf.tools.checkpoint_manager import CheckpointManager
+from daf.tools.checkpoint_manager import CheckpointManager, CheckpointCorruptError
 
 app = typer.Typer(
     name="daf",
@@ -51,9 +51,17 @@ def init(
         return
 
     if resume is not None:
-        checkpoint = CheckpointManager().get_last_valid_checkpoint(output_dir=resume)
+        cm = CheckpointManager()
+        checkpoint = cm.get_last_valid_checkpoint(output_dir=resume)
         if checkpoint is None:
             typer.echo("No valid checkpoints found")
+            raise typer.Exit(code=1)
+        try:
+            cm.restore(output_dir=resume, phase=checkpoint["phase"])
+        except CheckpointCorruptError as exc:
+            typer.echo(
+                f"Checkpoint is corrupt and cannot be restored: {exc}. Please restart from Phase 1."
+            )
             raise typer.Exit(code=1)
         run_first_publish_agent(resume, start_phase=checkpoint["phase"] + 1)
         return
