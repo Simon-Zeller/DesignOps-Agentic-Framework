@@ -5,7 +5,6 @@ component metadata (name, props, variants, states, slots).
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -13,9 +12,10 @@ from crewai.tools import BaseTool
 from pydantic import BaseModel
 
 try:
-    import yaml  # type: ignore[import-untyped]
+    import yaml as _yaml  # type: ignore[import-untyped]
     _YAML_AVAILABLE = True
 except ImportError:
+    _yaml = None  # type: ignore[assignment]
     _YAML_AVAILABLE = False
 
 
@@ -23,8 +23,8 @@ def _load_spec_file(path: Path) -> dict[str, Any]:
     """Load a spec YAML file, returning an empty dict on failure."""
     try:
         text = path.read_text(encoding="utf-8")
-        if _YAML_AVAILABLE:
-            return yaml.safe_load(text) or {}
+        if _YAML_AVAILABLE and _yaml is not None:
+            return _yaml.safe_load(text) or {}
         # Minimal YAML-like parsing fallback (key: value on separate lines)
         result: dict[str, Any] = {}
         for line in text.splitlines():
