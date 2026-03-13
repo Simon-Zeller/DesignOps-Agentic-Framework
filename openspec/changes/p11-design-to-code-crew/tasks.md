@@ -50,7 +50,7 @@ Write failing tests FIRST, before any production code. Each test maps to a case 
 - [x] 1.21 Create `tests/test_design_to_code_crew.py` — full crew run writes expected file tree from fixture specs (mocked LLM + Playwright)
 - [x] 1.22 Add fixture files: `tests/fixtures/specs/box.spec.yaml`, `tests/fixtures/specs/button.spec.yaml`, `tests/fixtures/tokens/flat.json`
 - [x] 1.23 Verify all 21 new test files **FAIL** (red phase confirmation — no production code exists yet)
-- [ ] 1.24 **Git checkpoint:** `git add -A && git commit -m "test: scaffold failing tests for p11-design-to-code-crew"`
+- [x] 1.24 **Git checkpoint:** `git add -A && git commit -m "test: scaffold failing tests for p11-design-to-code-crew"`
 
 ---
 
@@ -60,21 +60,21 @@ Implement tools first, then agents, then the crew factory. Make tests pass progr
 
 ### 2a. Deterministic tools
 
-- [ ] 2.1 Implement `src/daf/tools/scope_analyzer.py` — make `test_scope_analyzer.py` pass
-- [ ] 2.2 Implement `src/daf/tools/dependency_graph_builder.py` — make `test_dependency_graph_builder.py` pass
-- [ ] 2.3 Implement `src/daf/tools/priority_queue_builder.py` — make `test_priority_queue_builder.py` pass
-- [ ] 2.4 Implement `src/daf/tools/spec_parser.py` — make `test_spec_parser.py` pass
-- [ ] 2.5 Implement `src/daf/tools/layout_analyzer.py` — make `test_layout_analyzer.py` pass
-- [ ] 2.6 Implement `src/daf/tools/a11y_attribute_extractor.py` — make `test_a11y_attribute_extractor.py` pass
-- [ ] 2.7 Implement `src/daf/tools/code_scaffolder.py` — make `test_code_scaffolder.py` pass (TSX skeleton, story exports, accessibility placeholder)
-- [ ] 2.8 Implement `src/daf/tools/eslint_runner.py` — make `test_eslint_runner.py` pass
-- [ ] 2.9 Implement `src/daf/tools/story_template_generator.py` — make `test_story_template_generator.py` pass
-- [ ] 2.10 Implement `src/daf/tools/pattern_memory_store.py` — make `test_pattern_memory_store.py` pass
-- [ ] 2.11 Implement `src/daf/tools/playwright_renderer.py` — make `test_playwright_renderer.py` pass (including fallback mode)
-- [ ] 2.12 Implement `src/daf/tools/render_error_detector.py` — make `test_render_error_detector.py` pass
-- [ ] 2.13 Implement `src/daf/tools/dimension_validator.py` — make `test_dimension_validator.py` pass
-- [ ] 2.14 Implement `src/daf/tools/confidence_scorer.py` — make `test_confidence_scorer.py` pass
-- [ ] 2.15 Implement `src/daf/tools/report_writer.py` — make `test_report_writer.py` pass
+- [x] 2.1 Implement `src/daf/tools/scope_analyzer.py` — make `test_scope_analyzer.py` pass
+- [x] 2.2 Implement `src/daf/tools/dependency_graph_builder.py` — make `test_dependency_graph_builder.py` pass
+- [x] 2.3 Implement `src/daf/tools/priority_queue_builder.py` — make `test_priority_queue_builder.py` pass
+- [x] 2.4 Implement `src/daf/tools/spec_parser.py` — make `test_spec_parser.py` pass
+- [x] 2.5 Implement `src/daf/tools/layout_analyzer.py` — make `test_layout_analyzer.py` pass
+- [x] 2.6 Implement `src/daf/tools/a11y_attribute_extractor.py` — make `test_a11y_attribute_extractor.py` pass
+- [x] 2.7 Implement `src/daf/tools/code_scaffolder.py` — make `test_code_scaffolder.py` pass (TSX skeleton, story exports, accessibility placeholder)
+- [x] 2.8 Implement `src/daf/tools/eslint_runner.py` — make `test_eslint_runner.py` pass
+- [x] 2.9 Implement `src/daf/tools/story_template_generator.py` — make `test_story_template_generator.py` pass
+- [x] 2.10 Implement `src/daf/tools/pattern_memory_store.py` — make `test_pattern_memory_store.py` pass
+- [x] 2.11 Implement `src/daf/tools/playwright_renderer.py` — make `test_playwright_renderer.py` pass (including fallback mode)
+- [x] 2.12 Implement `src/daf/tools/render_error_detector.py` — make `test_render_error_detector.py` pass
+- [x] 2.13 Implement `src/daf/tools/dimension_validator.py` — make `test_dimension_validator.py` pass
+- [x] 2.14 Implement `src/daf/tools/confidence_scorer.py` — make `test_confidence_scorer.py` pass
+- [x] 2.15 Implement `src/daf/tools/report_writer.py` — make `test_report_writer.py` pass
 - [ ] 2.16 **Git checkpoint:** `git add -A && git commit -m "feat(tools): implement 15 Design-to-Code tools"`
 
 ### 2b. Agents

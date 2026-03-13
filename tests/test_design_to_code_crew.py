@@ -33,7 +33,7 @@ def test_full_crew_run_writes_expected_file_tree(tmp_path):
     with patch("daf.tools.playwright_renderer.check_renderer_available", return_value=False):
         from daf.crews.design_to_code import create_design_to_code_crew
         crew = create_design_to_code_crew(str(tmp_path))
-        crew.run()
+        crew.kickoff()
 
     # Component files should be written
     src_dir = tmp_path / "src"
@@ -44,4 +44,4 @@ def test_full_crew_run_writes_expected_file_tree(tmp_path):
     assert report_path.exists(), "generation-summary.json was not created"
     data = json.loads(report_path.read_text())
     assert "total_components" in data
-    assert data["stub"] is not True if "stub" not in data else True  # must not be stub output
+    assert "stub" not in data  # must not be stub output
