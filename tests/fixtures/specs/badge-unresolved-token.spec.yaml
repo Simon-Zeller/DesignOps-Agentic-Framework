@@ -1,0 +1,21 @@
+component: Badge
+description: Status badge component referencing an unresolved token.
+variants:
+  - info
+  - success
+  - warning
+  - error
+states:
+  - default
+composedOf:
+  - Box
+  - Text
+tokens:
+  background: color.status.info
+  foreground: color.text.onStatus
+  borderRadius: radius.sm
+  paddingX: space.2
+  paddingY: space.1
+a11y:
+  role: status
+  label: true

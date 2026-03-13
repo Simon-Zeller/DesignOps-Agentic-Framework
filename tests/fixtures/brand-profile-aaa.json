@@ -1,0 +1,16 @@
+{
+  "brand": "Acme Design System",
+  "a11y_level": "AAA",
+  "color_mode": "light",
+  "typography": {
+    "base_size": 16,
+    "scale": 1.25
+  },
+  "motion": {
+    "reduce_motion": false
+  },
+  "focus": {
+    "visible_always": true,
+    "outline_width": 3
+  }
+}
