@@ -25,6 +25,20 @@ from daf.tools.focus_trap_validator import validate_focus_trap
 from daf.tools.coverage_reporter import get_coverage
 from daf.tools.score_calculator import calculate_score
 from daf.tools.threshold_gate import apply_gate, gate_components
+from daf.tools.spec_to_doc_renderer import render_spec_to_sections
+from daf.tools.prop_table_generator import generate_prop_table
+from daf.tools.example_code_generator import generate_example_stub
+from daf.tools.readme_template import render_readme
+from daf.tools.token_value_resolver import resolve_token, classify_tier
+from daf.tools.scale_visualizer import visualize_token
+from daf.tools.usage_context_extractor import extract_usage_context
+from daf.tools.decision_log_reader import read_decisions
+from daf.tools.brand_profile_analyzer import analyze_brand_profile
+from daf.tools.prose_generator import build_narrative_prompt
+from daf.tools.decision_extractor import extract_decisions
+from daf.tools.adr_template_generator import generate_adr, slugify_title
+from daf.tools.search_index_builder import build_index_entries
+from daf.tools.metadata_tagger import tag_entry
 
 __all__ = [
     "ArchetypeResolver",
@@ -54,4 +68,20 @@ __all__ = [
     "calculate_score",
     "apply_gate",
     "gate_components",
+    "render_spec_to_sections",
+    "generate_prop_table",
+    "generate_example_stub",
+    "render_readme",
+    "resolve_token",
+    "classify_tier",
+    "visualize_token",
+    "extract_usage_context",
+    "read_decisions",
+    "analyze_brand_profile",
+    "build_narrative_prompt",
+    "extract_decisions",
+    "generate_adr",
+    "slugify_title",
+    "build_index_entries",
+    "tag_entry",
 ]
