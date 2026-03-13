@@ -3,6 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from crewai.tools import BaseTool
+from pydantic import BaseModel
+
 
 def apply_gate(score: float, threshold: float = 70.0) -> dict[str, Any]:
     """Apply quality gate for a single component.
@@ -46,3 +49,27 @@ def gate_components(
             failed.append(name)
 
     return {"passed": passed, "failed": failed}
+
+
+# ---------------------------------------------------------------------------
+# ThresholdGate BaseTool
+# ---------------------------------------------------------------------------
+
+
+class _GateInput(BaseModel):
+    score: float
+    threshold: float = 70.0
+
+
+class ThresholdGate(BaseTool):
+    """Apply a numeric quality threshold gate to a component score."""
+
+    name: str = "threshold_gate"
+    description: str = (
+        "Applies a numeric quality threshold gate to a single composite score. "
+        "Returns {gate: 'passed'|'failed', verdict: bool}."
+    )
+    args_schema: type[BaseModel] = _GateInput
+
+    def _run(self, score: float, threshold: float = 70.0, **kwargs: Any) -> dict[str, Any]:
+        return apply_gate(score, threshold)

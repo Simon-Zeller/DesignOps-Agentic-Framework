@@ -5,6 +5,11 @@ import json
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _set_api_key(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
+
 def test_crew_raises_runtime_error_when_component_index_absent(tmp_path):
     """RuntimeError raised when docs/component-index.json is missing."""
     from daf.crews.governance import create_governance_crew

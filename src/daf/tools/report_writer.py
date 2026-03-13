@@ -5,6 +5,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from crewai.tools import BaseTool
+from pydantic import BaseModel
+
 
 def write_generation_summary(
     results: list[dict[str, Any]],
@@ -36,3 +39,35 @@ def write_generation_summary(
 
     output_path = reports_dir / "generation-summary.json"
     output_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# ReportWriter BaseTool — governance/quality-gates.json
+# ---------------------------------------------------------------------------
+
+
+class _WriterInput(BaseModel):
+    results: dict[str, Any]
+    output_path: str
+
+
+class ReportWriter(BaseTool):
+    """Serialize quality gate results to governance/quality-gates.json."""
+
+    name: str = "governance_report_writer"
+    description: str = (
+        "Serializes per-component quality gate results to the given output_path as JSON. "
+        "Creates parent directories if needed."
+    )
+    args_schema: type[BaseModel] = _WriterInput
+
+    def _run(
+        self,
+        results: dict[str, Any],
+        output_path: str,
+        **kwargs: Any,
+    ) -> str:
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(json.dumps(results, indent=2), encoding="utf-8")
+        return str(out)

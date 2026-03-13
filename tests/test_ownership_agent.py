@@ -1,6 +1,13 @@
 """Tests for Agent 26: Ownership Agent."""
 from __future__ import annotations
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _set_api_key(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
 
 def test_ownership_agent_has_correct_role_and_tools(tmp_path):
     """Agent role contains 'ownership' and tools include the three expected classes."""

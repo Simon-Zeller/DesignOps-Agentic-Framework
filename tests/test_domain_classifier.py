@@ -35,8 +35,8 @@ def test_unmatched_component_is_orphan():
     """A component with no domain match is classified as __orphan__."""
     from daf.tools.domain_classifier import classify
 
-    result = classify(["MegaMenu"], DOMAINS)
-    assert result["MegaMenu"] == "__orphan__"
+    result = classify(["Spinner"], DOMAINS)
+    assert result["Spinner"] == "__orphan__"
 
 
 def test_empty_component_list_returns_empty_dict():

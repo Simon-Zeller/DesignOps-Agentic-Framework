@@ -1,6 +1,13 @@
 """Tests for Agent 30: Quality Gate Agent."""
 from __future__ import annotations
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _set_api_key(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
 
 def test_quality_gate_agent_has_correct_tools(tmp_path):
     """Agent tools include GateEvaluator, ThresholdGate, ReportWriter, TestSuiteGenerator."""
