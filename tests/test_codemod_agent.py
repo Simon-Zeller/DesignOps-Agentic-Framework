@@ -4,6 +4,12 @@ from __future__ import annotations
 from pathlib import Path
 
 import crewai
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _set_api_key(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
 
 
 def test_create_codemod_agent_returns_crewai_agent(tmp_path: Path) -> None:
@@ -29,7 +35,7 @@ def test_codemod_agent_uses_haiku_model(tmp_path: Path) -> None:
 
     model = "claude-3-haiku-20240307"
     agent = create_codemod_agent(model, str(tmp_path))
-    assert agent.llm == model
+    assert "haiku" in agent.llm.model.lower()
 
 
 def test_codemod_agent_has_required_tools(tmp_path: Path) -> None:

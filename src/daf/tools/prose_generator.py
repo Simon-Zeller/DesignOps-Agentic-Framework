@@ -3,6 +3,33 @@ from __future__ import annotations
 
 from typing import Any
 
+from crewai.tools import BaseTool
+from pydantic import Field
+
+
+class ProseGenerator(BaseTool):
+    """BaseTool wrapper for building prose generation prompts."""
+
+    name: str = Field(default="prose_generator")
+    description: str = Field(
+        default=(
+            "Accepts a JSON string with brand_analysis and decisions keys. "
+            "Returns a narrative prompt string suitable for LLM prose generation."
+        )
+    )
+    output_dir: str = Field(default="")
+
+    def _run(self, prompt_json: str = "", **kwargs: Any) -> str:
+        import json  # noqa: PLC0415
+        try:
+            data = json.loads(prompt_json)
+            brand_analysis = data.get("brand_analysis", {})
+            decisions = data.get("decisions", [])
+        except (json.JSONDecodeError, TypeError):
+            brand_analysis = {}
+            decisions = []
+        return build_narrative_prompt(brand_analysis, decisions)
+
 
 def build_narrative_prompt(brand_analysis: dict[str, Any], decisions: list[dict[str, Any]]) -> str:
     """Compose a narrative generation prompt from brand data and decision records.
