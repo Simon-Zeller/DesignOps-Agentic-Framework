@@ -97,7 +97,7 @@ def scaffold_tsx(manifest: dict[str, Any]) -> str:
     aria_props_lines = ""
     aria_destructure_lines = ""
     if aria.get("role") and aria["role"] not in ("generic", ""):
-        aria_props_lines = f"  role?: string;\n  'aria-label'?: string;\n"
+        aria_props_lines = "  role?: string;\n  'aria-label'?: string;\n"
         aria_destructure_lines = "  role,\n  'aria-label': ariaLabel,\n"
         aria_attrs_lines = "      role={role}\n      aria-label={ariaLabel}\n"
 
@@ -137,9 +137,9 @@ def scaffold_stories(manifest: dict[str, Any]) -> str:
 
     if not story_exports:
         story_exports.append(
-            f"export const Default: Story = {{\n"
-            f"  args: {{}},\n"
-            f"}};"
+            "export const Default: Story = {\n"
+            "  args: {},\n"
+            "};"
         )
 
     return _STORY_TEMPLATE.format(

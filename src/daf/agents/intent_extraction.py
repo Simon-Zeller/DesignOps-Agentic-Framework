@@ -39,13 +39,6 @@ def _extract_intents(output_dir: str) -> None:
     scope_data = json.loads(scope_path.read_text(encoding="utf-8"))
     components: list[dict[str, Any]] = scope_data.get("components", [])
 
-    # Load compiled tokens for token binding resolution
-    tokens_dir = od / "tokens" / "compiled"
-    compiled_tokens: dict[str, str] = {}
-    flat_path = tokens_dir / "flat.json"
-    if flat_path.exists():
-        compiled_tokens = json.loads(flat_path.read_text(encoding="utf-8"))
-
     # Build a name → spec file mapping
     spec_files: dict[str, Path] = {}
     specs_dir = od / "specs"

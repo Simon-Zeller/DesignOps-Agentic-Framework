@@ -75,44 +75,50 @@ Implement tools first, then agents, then the crew factory. Make tests pass progr
 - [x] 2.13 Implement `src/daf/tools/dimension_validator.py` — make `test_dimension_validator.py` pass
 - [x] 2.14 Implement `src/daf/tools/confidence_scorer.py` — make `test_confidence_scorer.py` pass
 - [x] 2.15 Implement `src/daf/tools/report_writer.py` — make `test_report_writer.py` pass
-- [ ] 2.16 **Git checkpoint:** `git add -A && git commit -m "feat(tools): implement 15 Design-to-Code tools"`
+- [x] 2.16 **Git checkpoint:** `git add -A && git commit -m "feat(tools): implement 15 Design-to-Code tools"`
 
 ### 2b. Agents
 
-- [ ] 2.17 Implement `src/daf/agents/scope_classification.py` (Agent 12) — make `test_scope_classification_agent.py` pass
+- [x] 2.17 Implement `src/daf/agents/scope_classification.py` (Agent 12) — make `test_scope_classification_agent.py` pass
   - Tier-3 (Haiku); tools: `scope_analyzer`, `dependency_graph_builder`, `priority_queue_builder`
-- [ ] 2.18 Implement `src/daf/agents/intent_extraction.py` (Agent 13) — make `test_intent_extraction_agent.py` pass
+- [x] 2.18 Implement `src/daf/agents/intent_extraction.py` (Agent 13) — make `test_intent_extraction_agent.py` pass
   - Tier-2 (Sonnet); tools: `spec_parser`, `layout_analyzer`, `a11y_attribute_extractor`
-- [ ] 2.19 Implement `src/daf/agents/code_generation.py` (Agent 14) — make `test_code_generation_agent.py` pass
+- [x] 2.19 Implement `src/daf/agents/code_generation.py` (Agent 14) — make `test_code_generation_agent.py` pass
   - Tier-1 (Opus); tools: `code_scaffolder`, `eslint_runner`, `story_template_generator`, `pattern_memory_store`
   - Implements inline lint-retry loop (max 2 cycles per file)
   - Writes `reports/generation-rejection.json` on unresolvable failures
-- [ ] 2.20 Implement `src/daf/agents/render_validation.py` (Agent 15) — make `test_render_validation_agent.py` pass
+- [x] 2.20 Implement `src/daf/agents/render_validation.py` (Agent 15) — make `test_render_validation_agent.py` pass
   - Tier-3 (Haiku); tools: `playwright_renderer`, `render_error_detector`, `dimension_validator`
   - Implements Playwright fallback mode (`render_available: false`)
-- [ ] 2.21 Implement `src/daf/agents/result_assembly.py` (Agent 16) — make `test_result_assembly_agent.py` pass
+- [x] 2.21 Implement `src/daf/agents/result_assembly.py` (Agent 16) — make `test_result_assembly_agent.py` pass
   - Tier-3 (Haiku); tools: `confidence_scorer`, `report_writer`
-- [ ] 2.22 **Git checkpoint:** `git add -A && git commit -m "feat(agents): implement Agents 12–16 for Design-to-Code Crew"`
+- [x] 2.22 **Git checkpoint:** `git add -A && git commit -m "feat(agents): implement Agents 12–16 for Design-to-Code Crew"`
 
 ### 2c. Crew factory
 
-- [ ] 2.23 Replace stub in `src/daf/crews/design_to_code.py` with real CrewAI `Crew` sequencing T1→T5 (Agents 12–16)
+- [x] 2.23 Replace stub in `src/daf/crews/design_to_code.py` with real CrewAI `Crew` sequencing T1→T5 (Agents 12–16)
   - Preserve `create_design_to_code_crew(output_dir: str)` factory signature
   - Sequence: T1 (Agent 12) → T2 (Agent 13) → T3 (Agent 14) → T4 (Agent 15) → T5 (Agent 16)
-- [ ] 2.24 Make `test_design_to_code_crew.py` integration test pass
-- [ ] 2.25 Verify all tool and agent tests remain green (`pytest tests/test_scope_* tests/test_intent_* tests/test_code_* tests/test_render_* tests/test_result_* tests/test_spec_* tests/test_layout_* tests/test_a11y_* tests/test_eslint_* tests/test_story_* tests/test_pattern_* tests/test_playwright_* tests/test_dimension_* tests/test_confidence_* tests/test_report_* tests/test_design_to_code_crew.py`)
-- [ ] 2.26 **Git checkpoint:** `git add -A && git commit -m "feat: implement Design-to-Code Crew — Agents 12–16 replacing stub"`
+- [x] 2.24 Make `test_design_to_code_crew.py` integration test pass
+- [x] 2.25 Verify all tool and agent tests remain green (`pytest tests/test_scope_* tests/test_intent_* tests/test_code_* tests/test_render_* tests/test_result_* tests/test_spec_* tests/test_layout_* tests/test_a11y_* tests/test_eslint_* tests/test_story_* tests/test_pattern_* tests/test_playwright_* tests/test_dimension_* tests/test_confidence_* tests/test_report_* tests/test_design_to_code_crew.py`)
+- [x] 2.26 **Git checkpoint:** `git add -A && git commit -m "feat: implement Design-to-Code Crew — Agents 12–16 replacing stub"`
 
 ---
 
 ## 3. Refactor (TDD — Refactor Phase)
 
-- [ ] 3.1 Review `code_scaffolder.py` Jinja2 templates — extract to `src/daf/tools/templates/` if inline strings exceed 40 lines
-- [ ] 3.2 Review Agent 14's lint-retry loop — extract inline retry logic to a shared `_lint_retry(generate_fn, manifest, max_retries=2)` helper if reused
-- [ ] 3.3 Confirm all five agents follow the same tool-call convention as Agents 7–11 in `token_engine.py` (naming, imports, `@tool` decorators)
-- [ ] 3.4 Ensure `pattern_memory_store.py` uses a class (not module-level state) to avoid inter-test contamination
-- [ ] 3.5 Verify all tests still pass after refactor (`pytest tests/test_scope_analyzer.py tests/test_dependency_graph_builder.py tests/test_spec_parser.py tests/test_code_scaffolder.py tests/test_design_to_code_crew.py`)
-- [ ] 3.6 **Git checkpoint:** `git add -A && git commit -m "refactor: clean up Design-to-Code Crew tools and agents"`
+- [x] 3.1 Review `code_scaffolder.py` Jinja2 templates — extract to `src/daf/tools/templates/` if inline strings exceed 40 lines
+  - TSX template is ~35 lines (under 40-line threshold) — no extraction needed
+- [x] 3.2 Review Agent 14's lint-retry loop — extract inline retry logic to a shared `_lint_retry(generate_fn, manifest, max_retries=2)` helper if reused
+  - Loop only used once in code_generation.py — no extraction needed
+- [x] 3.3 Confirm all five agents follow the same tool-call convention as Agents 7–11 in `token_engine.py` (naming, imports, `@tool` decorators)
+  - All 5 agents have `create_<name>_agent()`, `create_<name>_task()`, `_<action>(output_dir)` — consistent
+- [x] 3.4 Ensure `pattern_memory_store.py` uses a class (not module-level state) to avoid inter-test contamination
+  - `PatternMemoryStore` class confirmed; tests create fresh instances
+- [x] 3.5 Verify all tests still pass after refactor (`pytest tests/test_scope_analyzer.py tests/test_dependency_graph_builder.py tests/test_spec_parser.py tests/test_code_scaffolder.py tests/test_design_to_code_crew.py`)
+  - 11/11 passed
+- [x] 3.6 **Git checkpoint:** `git add -A && git commit -m "refactor: clean up Design-to-Code Crew tools and agents"`
+  - No refactors applied — skipped (no-op commit)
 
 ---
 

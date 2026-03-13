@@ -15,7 +15,6 @@ from crewai import Agent, Task
 
 from daf.tools.code_scaffolder import scaffold_tsx, scaffold_tests, scaffold_stories
 from daf.tools.eslint_runner import run_eslint
-from daf.tools.story_template_generator import generate_stories
 from daf.tools.pattern_memory_store import PatternMemoryStore
 
 _MAX_LINT_RETRIES = 2

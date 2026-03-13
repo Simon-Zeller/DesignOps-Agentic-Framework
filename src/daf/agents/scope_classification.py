@@ -41,7 +41,7 @@ def _classify_specs(output_dir: str) -> None:
 
     if not raw_specs:
         # Nothing to classify — write empty output
-        output = {"components": []}
+        output: dict[str, Any] = {"components": []}
         (od / "scope_classifier_output.json").write_text(
             json.dumps(output, indent=2), encoding="utf-8"
         )
@@ -60,7 +60,7 @@ def _classify_specs(output_dir: str) -> None:
     # Build priority queue
     queue = build_priority_queue(classified, topo_order)
 
-    output: dict[str, Any] = {"components": queue}
+    output = {"components": queue}
     (od / "scope_classifier_output.json").write_text(
         json.dumps(output, indent=2), encoding="utf-8"
     )

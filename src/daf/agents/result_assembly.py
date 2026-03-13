@@ -94,6 +94,24 @@ def _assemble_results(output_dir: str) -> None:
 
     write_generation_summary(results, output_dir)
 
+    # Write barrel export files
+    primitives = [r["component"] for r in results if r["tier"] == "primitive"]
+    components = [r["component"] for r in results if r["tier"] != "primitive"]
+
+    primitives_dir = od / "src" / "primitives"
+    primitives_dir.mkdir(parents=True, exist_ok=True)
+    prim_exports = "".join(f"export * from './{n}/{n}';\n" for n in primitives)
+    (primitives_dir / "index.ts").write_text(prim_exports, encoding="utf-8")
+
+    components_dir = od / "src" / "components"
+    components_dir.mkdir(parents=True, exist_ok=True)
+    comp_exports = "".join(f"export * from './{n}/{n}';\n" for n in components)
+    (components_dir / "index.ts").write_text(comp_exports, encoding="utf-8")
+
+    src_dir = od / "src"
+    root_exports = "export * from './primitives';\nexport * from './components';\n"
+    (src_dir / "index.ts").write_text(root_exports, encoding="utf-8")
+
 
 def create_result_assembly_agent() -> Agent:
     """Instantiate the Result Assembly Agent (Agent 16 — Tier 3, Haiku)."""
