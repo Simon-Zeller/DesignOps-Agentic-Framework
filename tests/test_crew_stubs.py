@@ -56,14 +56,6 @@ CREW_OUTPUT_SPECS = [
         ],
     ),
     (
-        "daf.crews.analytics",
-        "create_analytics_crew",
-        [
-            "reports/token-compliance.json",
-            "reports/drift-report.json",
-        ],
-    ),
-    (
         "daf.crews.release",
         "create_release_crew",
         [
