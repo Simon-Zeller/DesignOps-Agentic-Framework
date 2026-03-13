@@ -35,10 +35,9 @@ CREW_OUTPUT_SPECS = [
         "create_documentation_crew",
         [
             "docs/README.md",
-            "docs/tokens.md",
+            "docs/tokens/catalog.md",
             "docs/search-index.json",
             "docs/decisions/generation-narrative.md",
-            "docs/changelog.md",
         ],
     ),
     (

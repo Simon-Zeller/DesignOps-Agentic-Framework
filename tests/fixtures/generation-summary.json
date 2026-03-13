@@ -1,0 +1,17 @@
+{
+  "archetype": "minimalist",
+  "decisions": [
+    {
+      "title": "Archetype Selection",
+      "context": "The brand required a minimal visual style.",
+      "decision": "Use minimalist archetype.",
+      "consequences": "Fewer colors and simpler type scale."
+    },
+    {
+      "title": "Token Scale Algorithm",
+      "context": "A modular scale was needed for consistent spacing.",
+      "decision": "Use a 1.25 ratio modular scale.",
+      "consequences": "Harmonious proportional spacing throughout."
+    }
+  ]
+}

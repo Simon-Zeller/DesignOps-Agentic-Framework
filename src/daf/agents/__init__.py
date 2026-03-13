@@ -71,10 +71,20 @@ from daf.agents.spec_validation import run_spec_validation
 from daf.agents.composition import run_composition_check
 from daf.agents.accessibility import run_accessibility_enforcement
 from daf.agents.quality_scoring import run_quality_scoring
+from daf.agents.doc_generation import run_doc_generation
+from daf.agents.token_catalog import run_token_catalog
+from daf.agents.generation_narrative import run_generation_narrative
+from daf.agents.decision_record import run_decision_records
+from daf.agents.search_index import run_search_index
 
 __all__ += [
     "run_spec_validation",
     "run_composition_check",
     "run_accessibility_enforcement",
     "run_quality_scoring",
+    "run_doc_generation",
+    "run_token_catalog",
+    "run_generation_narrative",
+    "run_decision_records",
+    "run_search_index",
 ]

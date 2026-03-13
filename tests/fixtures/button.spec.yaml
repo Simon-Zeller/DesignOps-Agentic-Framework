@@ -1,0 +1,20 @@
+component: Button
+variants:
+  - primary
+  - secondary
+states:
+  default: {}
+  disabled:
+    terminal: true
+props:
+  label:
+    type: string
+    required: true
+  disabled:
+    type: boolean
+    required: false
+    default: false
+tokens:
+  background: color.interactive.default
+a11y:
+  role: button
