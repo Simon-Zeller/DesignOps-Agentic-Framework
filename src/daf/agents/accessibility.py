@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any
 
 from daf.tools.aria_generator import generate_aria_patches
-from daf.tools.keyboard_nav_scaffolder import scaffold_keyboard_handlers
 from daf.tools.focus_trap_validator import validate_focus_trap
 
 
