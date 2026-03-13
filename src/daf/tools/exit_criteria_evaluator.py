@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from daf.tools.ast_pattern_matcher import ASTPatternMatcher
 from daf.tools.contrast_safe_pairer import ContrastSafePairer
 from daf.tools.dependency_resolver import DependencyResolver
-from daf.tools.dtcg_schema_validator import DTCGSchemaValidator as DTCGSchemaValidator
+from daf.tools.dtcg_schema_validator import DTCGSchemaValidator
 from daf.tools.json_schema_validator import validate_spec_schema
 from daf.tools.token_graph_traverser import TokenGraphTraverser
 from daf.tools.token_ref_checker import check_token_refs
@@ -256,16 +256,25 @@ class ExitCriteriaEvaluator(BaseTool):
 
     def _check_c5(self, output_dir: str) -> CriterionResult:
         pairer = ContrastSafePairer()
-        result = pairer._run(palette={}, accessibility="AA")
+        result: Any = pairer._run(palette={}, accessibility="AA")
 
-        if not result.get("all_pass", True):
-            failing = [p for p in result.get("pairs", []) if not p.get("pass", True)]
+        # Real return: tuple(semantic_overrides, [ContrastPairResult, ...])
+        # Mocked return in tests: {"all_pass": bool, "pairs": [...]}
+        if isinstance(result, dict):
+            all_pass: bool = result.get("all_pass", True)
+            failing_pairs: list[Any] = [p for p in result.get("pairs", []) if not p.get("pass", True)]
+        else:
+            _semantic, contrast_results = result
+            failing_pairs = [r for r in contrast_results if not r.passed]
+            all_pass = len(failing_pairs) == 0
+
+        if not all_pass:
             return CriterionResult(
                 id=5,
                 description=_CRITERION_DESCRIPTIONS[5],
                 severity="fatal",
                 passed=False,
-                detail=f"failing pairs: {failing[:3]}",
+                detail=f"failing pairs: {failing_pairs[:3]}",
             )
 
         return CriterionResult(
