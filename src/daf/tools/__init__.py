@@ -47,6 +47,17 @@ from daf.tools.doc_patcher import DocPatcher
 from daf.tools.pipeline_stage_tracker import PipelineStageTracker
 from daf.tools.dependency_chain_walker import DependencyChainWalker
 from daf.tools.token_compliance_scanner import TokenComplianceScannerTool
+from daf.tools.spec_indexer import SpecIndexer
+from daf.tools.example_code_generator import ExampleCodeGenerator
+from daf.tools.registry_builder import RegistryBuilder
+from daf.tools.token_graph_traverser import TokenGraphTraverser
+from daf.tools.semantic_mapper import SemanticMapper
+from daf.tools.composition_rule_extractor import CompositionRuleExtractor
+from daf.tools.tree_validator import TreeValidator
+from daf.tools.rule_compiler import RuleCompiler
+from daf.tools.context_formatter import ContextFormatter
+from daf.tools.token_budget_optimizer import TokenBudgetOptimizer
+from daf.tools.multi_format_serializer import MultiFormatSerializer
 
 __all__ = [
     "ArchetypeResolver",
@@ -100,4 +111,15 @@ __all__ = [
     "PipelineStageTracker",
     "DependencyChainWalker",
     "TokenComplianceScannerTool",
+    "SpecIndexer",
+    "ExampleCodeGenerator",
+    "RegistryBuilder",
+    "TokenGraphTraverser",
+    "SemanticMapper",
+    "CompositionRuleExtractor",
+    "TreeValidator",
+    "RuleCompiler",
+    "ContextFormatter",
+    "TokenBudgetOptimizer",
+    "MultiFormatSerializer",
 ]

@@ -42,19 +42,8 @@ CREW_OUTPUT_SPECS = [
     ),
     # governance crew graduated from StubCrew to real crewai.Crew in p14;
     # its contract is tested in tests/test_governance_crew.py instead.
-    (
-        "daf.crews.ai_semantic_layer",
-        "create_ai_semantic_layer_crew",
-        [
-            "registry/components.json",
-            "registry/tokens.json",
-            "registry/composition-rules.json",
-            "registry/compliance-rules.json",
-            ".cursorrules",
-            "copilot-instructions.md",
-            "ai-context.json",
-        ],
-    ),
+    # ai_semantic_layer crew graduated from StubCrew to real crewai.Crew in p16;
+    # its contract is tested in tests/test_ai_semantic_layer_crew.py instead.
     (
         "daf.crews.release",
         "create_release_crew",
