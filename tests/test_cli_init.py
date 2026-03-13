@@ -97,3 +97,69 @@ def test_init_profile_does_not_create_session_file(tmp_path, monkeypatch):
     runner.invoke(app, ["init", "--profile", str(profile_path)])
 
     assert not (tmp_path / ".daf-session.json").exists()
+
+
+# ---------------------------------------------------------------------------
+# p09: Resume and Gate 2 integration tests
+# ---------------------------------------------------------------------------
+
+def _make_valid_checkpoint_dir(output_dir) -> None:
+    """Populate a valid Phase-3 checkpoint structure in output_dir."""
+    from daf.tools.checkpoint_manager import CheckpointManager
+    import json as _json
+    from pathlib import Path as _Path
+
+    od = _Path(output_dir)
+    od.mkdir(parents=True, exist_ok=True)
+    (od / "brand-profile.json").write_text(_json.dumps({"name": "Test"}))
+
+    cm = CheckpointManager()
+    cm.create(output_dir=str(od), phase=1)
+    cm.create(output_dir=str(od), phase=2)
+    cm.create(output_dir=str(od), phase=3)
+
+
+def test_cli_resume_from_valid_checkpoint(tmp_path, monkeypatch):
+    """--resume with valid phase-3 checkpoint starts first_publish_agent from phase 4."""
+    _make_valid_checkpoint_dir(tmp_path)
+
+    captured_start_phase = []
+
+    def _mock_run_first_publish(output_dir, start_phase=1):
+        captured_start_phase.append(start_phase)
+
+    monkeypatch.setattr("daf.cli.run_first_publish_agent", _mock_run_first_publish)
+
+    result = runner.invoke(app, ["init", "--resume", str(tmp_path)])
+    assert result.exit_code == 0, f"Expected exit 0, got:\n{result.output}"
+    assert captured_start_phase, "run_first_publish_agent was not called"
+    assert captured_start_phase[0] == 4, (
+        f"Expected start_phase=4 (resume after phase 3), got {captured_start_phase[0]}"
+    )
+
+
+def test_cli_resume_no_checkpoints_exits_nonzero(tmp_path):
+    """--resume with no checkpoints exits with code 1 and reports the problem."""
+    # tmp_path has no .daf-checkpoints directory at all
+    result = runner.invoke(app, ["init", "--resume", str(tmp_path)])
+    assert result.exit_code == 1
+    assert "No valid checkpoints found" in result.output
+
+
+def test_cli_gate2_approve_exits_zero(tmp_path, monkeypatch):
+    """Gate 2 'A' (approve) input exits zero and confirms completion."""
+    monkeypatch.chdir(tmp_path)
+
+    # Mock out the full interview so it returns immediately
+    monkeypatch.setattr("daf.interview.run_interview", lambda cwd: None)
+
+    # Mock run_first_publish_agent to return a success result without LLM calls
+    successful_result = {
+        "pipeline": {"status": "success"},
+        "phase_results": [],
+    }
+    monkeypatch.setattr("daf.cli.run_first_publish_agent", lambda od, **kw: successful_result)
+
+    result = runner.invoke(app, ["init"], input="A\n")
+    assert result.exit_code == 0, f"Expected exit 0, got:\n{result.output}"
+    assert "Design system generation complete" in result.output
