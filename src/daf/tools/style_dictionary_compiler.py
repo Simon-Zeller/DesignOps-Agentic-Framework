@@ -218,3 +218,81 @@ class StyleDictionaryCompiler(BaseTool):
                 written.append(str(brand_default))
 
         return written
+
+    def compile_themes(
+        self,
+        token_dir: str,
+        output_dir: str,
+        themes: list[str],
+    ) -> list[str]:
+        """Compile per-theme CSS files from staged token files.
+
+        Reads base.tokens.json and semantic.tokens.json from token_dir.
+        For each theme in themes, writes variables-{theme}.css to output_dir.
+        The first theme is treated as the default (:root selector); the rest
+        use .theme-{name} selectors.
+
+        Returns list of written file paths.
+        """
+        import json
+
+        token_path = Path(token_dir)
+        out_path = Path(output_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+
+        base_file = token_path / "base.tokens.json"
+        semantic_file = token_path / "semantic.tokens.json"
+
+        global_tokens: dict[str, str] = {}
+        if base_file.exists():
+            base_data = json.loads(base_file.read_text(encoding="utf-8"))
+            for key, obj in _walk_tokens(base_data):
+                global_tokens[key] = str(obj.get("$value", ""))
+
+        semantic_tokens: dict[str, Any] = {}
+        if semantic_file.exists():
+            semantic_tokens = json.loads(semantic_file.read_text(encoding="utf-8"))
+
+        all_tokens = _walk_tokens(semantic_tokens)
+        default_theme = themes[0] if themes else "light"
+        written: list[str] = []
+
+        for theme in themes:
+            selector = ":root" if theme == default_theme else f".theme-{theme}"
+            try:
+                css_content = _compile_css(all_tokens, global_tokens, theme, selector)
+            except ValueError:
+                # Fallback to $value when theme extension is missing
+                css_content = self._compile_css_with_fallback(
+                    all_tokens, global_tokens, theme, selector
+                )
+            out_file = out_path / f"variables-{theme}.css"
+            out_file.write_text(css_content, encoding="utf-8")
+            written.append(str(out_file))
+
+        return written
+
+    def _compile_css_with_fallback(
+        self,
+        tokens: list[tuple[str, dict[str, Any]]],
+        global_tokens: dict[str, str],
+        theme: str,
+        selector: str,
+    ) -> str:
+        """Compile CSS with graceful fallback when theme extension is missing."""
+        lines = [f"{selector} {{"]
+        for token_path, token_obj in tokens:
+            css_var = _token_path_to_css_var(token_path)
+            try:
+                value = _resolve_token_value(token_obj, theme, global_tokens)
+            except (ValueError, KeyError):
+                # Fallback: use $value directly or resolve the base reference
+                raw = str(token_obj.get("$value", ""))
+                match = _ALIAS_INNER_RE.match(raw)
+                if match:
+                    value = global_tokens.get(match.group(1), raw)
+                else:
+                    value = raw
+            lines.append(f"  {css_var}: {value};")
+        lines.append("}")
+        return "\n".join(lines) + "\n"

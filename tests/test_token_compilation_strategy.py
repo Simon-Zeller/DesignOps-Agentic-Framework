@@ -231,3 +231,53 @@ def test_non_multi_brand_skips_brand_compilation(tmp_path, base_semantic_tokens,
     assert not brand_files, (
         f"Non-multi-brand archetype should produce no brand files, got: {brand_files}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Tests — compile_themes() extension (p10 — new failing tests)
+# ---------------------------------------------------------------------------
+
+def test_compile_themes_writes_one_file_per_theme(tmp_path, base_semantic_tokens, global_tokens):
+    """compile_themes() produces one variables-{theme}.css per theme in themes list."""
+    from daf.tools.style_dictionary_compiler import StyleDictionaryCompiler
+    import json
+
+    # Write staged token files
+    staged = tmp_path / "tokens" / "staged"
+    staged.mkdir(parents=True, exist_ok=True)
+    (staged / "base.tokens.json").write_text(json.dumps({"color": {"neutral": {"50": {"$type": "color", "$value": "#F5F5F5"}, "900": {"$type": "color", "$value": "#1A1A1A"}, "950": {"$type": "color", "$value": "#0A0A0A"}}}}))
+    (staged / "semantic.tokens.json").write_text(json.dumps(base_semantic_tokens))
+    (staged / "component.tokens.json").write_text(json.dumps({}))
+
+    output_dir = tmp_path / "tokens" / "compiled"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    compiler = StyleDictionaryCompiler()
+    compiler.compile_themes(
+        token_dir=str(staged),
+        output_dir=str(output_dir),
+        themes=["light", "dark"],
+    )
+
+    assert (output_dir / "variables-light.css").exists()
+    assert (output_dir / "variables-dark.css").exists()
+
+
+def test_existing_compile_method_unmodified(tmp_path, base_semantic_tokens, global_tokens):
+    """The existing compile() method continues to pass all prior assertions."""
+    from daf.tools.style_dictionary_compiler import StyleDictionaryCompiler
+
+    compiler = StyleDictionaryCompiler()
+    written = compiler._run(
+        semantic_tokens=base_semantic_tokens,
+        global_tokens=global_tokens,
+        theme_modes=["light", "dark"],
+        default_theme="light",
+        archetype="enterprise-b2b",
+        brands=[],
+        output_dir=str(tmp_path),
+    )
+    written_names = {p.split("/")[-1] for p in written}
+    assert "variables.css" in written_names
+    assert "variables-light.css" in written_names
+    assert "variables-dark.css" in written_names

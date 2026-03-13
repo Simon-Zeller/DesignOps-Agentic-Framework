@@ -21,6 +21,26 @@ from daf.agents.pipeline_config import (
     create_pipeline_config_agent,
     create_pipeline_config_task,
 )
+from daf.agents.token_ingestion import (
+    create_token_ingestion_agent,
+    create_token_ingestion_task,
+)
+from daf.agents.token_validation import (
+    create_token_validation_agent,
+    create_token_validation_task,
+)
+from daf.agents.token_compilation import (
+    create_token_compilation_agent,
+    create_token_compilation_task,
+)
+from daf.agents.token_integrity import (
+    create_token_integrity_agent,
+    create_token_integrity_task,
+)
+from daf.agents.token_diff import (
+    create_token_diff_agent,
+    create_token_diff_task,
+)
 
 __all__ = [
     "create_brand_discovery_agent",
@@ -35,4 +55,14 @@ __all__ = [
     "create_core_component_task",
     "create_pipeline_config_agent",
     "create_pipeline_config_task",
+    "create_token_ingestion_agent",
+    "create_token_ingestion_task",
+    "create_token_validation_agent",
+    "create_token_validation_task",
+    "create_token_compilation_agent",
+    "create_token_compilation_task",
+    "create_token_integrity_agent",
+    "create_token_integrity_task",
+    "create_token_diff_agent",
+    "create_token_diff_task",
 ]

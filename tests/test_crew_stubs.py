@@ -12,20 +12,6 @@ import pytest
 
 CREW_OUTPUT_SPECS = [
     (
-        "daf.crews.token_engine",
-        "create_token_engine_crew",
-        [
-            "tokens/compiled/variables.css",
-            "tokens/compiled/variables-light.css",
-            "tokens/compiled/variables-dark.css",
-            "tokens/compiled/variables-high-contrast.css",
-            "tokens/compiled/variables.scss",
-            "tokens/compiled/tokens.ts",
-            "tokens/compiled/tokens.json",
-            "tokens/diff.json",
-        ],
-    ),
-    (
         "daf.crews.design_to_code",
         "create_design_to_code_crew",
         [
@@ -106,12 +92,16 @@ CREW_OUTPUT_SPECS = [
 # ---------------------------------------------------------------------------
 
 def test_token_engine_stub_writes_required_outputs(tmp_path: Path) -> None:
-    """Token Engine stub writes all required output files."""
-    # Provide raw token input files
+    """Token Engine crew writes all required output files when given valid token input."""
+    import json as _json
+    # Provide minimal valid DTCG token input files
     tokens_dir = tmp_path / "tokens"
     tokens_dir.mkdir()
-    for name in ("base.tokens.json", "semantic.tokens.json", "component.tokens.json"):
-        (tokens_dir / name).write_text('{"stub": true}')
+    base = {"color": {"brand": {"primary": {"$type": "color", "$value": "#005FCC"}}}}
+    semantic = {"color": {"interactive": {"default": {"$type": "color", "$value": "{color.brand.primary}"}}}}
+    (tokens_dir / "base.tokens.json").write_text(_json.dumps(base))
+    (tokens_dir / "semantic.tokens.json").write_text(_json.dumps(semantic))
+    (tokens_dir / "component.tokens.json").write_text(_json.dumps({}))
 
     from daf.crews.token_engine import create_token_engine_crew
 
