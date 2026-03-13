@@ -39,6 +39,14 @@ from daf.tools.decision_extractor import extract_decisions
 from daf.tools.adr_template_generator import generate_adr, slugify_title
 from daf.tools.search_index_builder import build_index_entries
 from daf.tools.metadata_tagger import tag_entry
+from daf.tools.ast_import_scanner import ASTImportScanner
+from daf.tools.token_usage_mapper import TokenUsageMapper
+from daf.tools.structural_comparator import StructuralComparator
+from daf.tools.drift_reporter import DriftReporter
+from daf.tools.doc_patcher import DocPatcher
+from daf.tools.pipeline_stage_tracker import PipelineStageTracker
+from daf.tools.dependency_chain_walker import DependencyChainWalker
+from daf.tools.token_compliance_scanner import TokenComplianceScannerTool
 
 __all__ = [
     "ArchetypeResolver",
@@ -84,4 +92,12 @@ __all__ = [
     "slugify_title",
     "build_index_entries",
     "tag_entry",
+    "ASTImportScanner",
+    "TokenUsageMapper",
+    "StructuralComparator",
+    "DriftReporter",
+    "DocPatcher",
+    "PipelineStageTracker",
+    "DependencyChainWalker",
+    "TokenComplianceScannerTool",
 ]
