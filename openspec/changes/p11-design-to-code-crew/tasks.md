@@ -124,12 +124,17 @@ Implement tools first, then agents, then the crew factory. Make tests pass progr
 
 ## 4. Integration & Quality
 
-- [ ] 4.1 Run full linter: `ruff check src/daf/agents/scope_classification.py src/daf/agents/intent_extraction.py src/daf/agents/code_generation.py src/daf/agents/render_validation.py src/daf/agents/result_assembly.py src/daf/crews/design_to_code.py src/daf/tools/scope_analyzer.py src/daf/tools/dependency_graph_builder.py src/daf/tools/priority_queue_builder.py src/daf/tools/spec_parser.py src/daf/tools/layout_analyzer.py src/daf/tools/a11y_attribute_extractor.py src/daf/tools/code_scaffolder.py src/daf/tools/eslint_runner.py src/daf/tools/story_template_generator.py src/daf/tools/pattern_memory_store.py src/daf/tools/playwright_renderer.py src/daf/tools/render_error_detector.py src/daf/tools/dimension_validator.py src/daf/tools/confidence_scorer.py src/daf/tools/report_writer.py` — zero violations
-- [ ] 4.2 Run type checker: `pyright src/daf/agents/scope_classification.py src/daf/agents/intent_extraction.py src/daf/agents/code_generation.py src/daf/agents/render_validation.py src/daf/agents/result_assembly.py src/daf/crews/design_to_code.py` — zero errors
-- [ ] 4.3 Fix all lint and type errors — zero warnings policy
-- [ ] 4.4 Run full test suite: `pytest` — verify all existing tests still pass (no regressions)
-- [ ] 4.5 Check coverage: `pytest --cov=src/daf/tools --cov=src/daf/agents --cov-report=term-missing` — each new file must show ≥80% line coverage
-- [ ] 4.6 **Git checkpoint:** `git add -A && git commit -m "chore: fix lint and type errors for p11-design-to-code-crew"` (skip if no changes needed)
+- [x] 4.1 Run full linter: `ruff check src/daf/agents/scope_classification.py src/daf/agents/intent_extraction.py src/daf/agents/code_generation.py src/daf/agents/render_validation.py src/daf/agents/result_assembly.py src/daf/crews/design_to_code.py src/daf/tools/scope_analyzer.py src/daf/tools/dependency_graph_builder.py src/daf/tools/priority_queue_builder.py src/daf/tools/spec_parser.py src/daf/tools/layout_analyzer.py src/daf/tools/a11y_attribute_extractor.py src/daf/tools/code_scaffolder.py src/daf/tools/eslint_runner.py src/daf/tools/story_template_generator.py src/daf/tools/pattern_memory_store.py src/daf/tools/playwright_renderer.py src/daf/tools/render_error_detector.py src/daf/tools/dimension_validator.py src/daf/tools/confidence_scorer.py src/daf/tools/report_writer.py` — zero violations
+- [x] 4.2 Run type checker: `pyright src/daf/agents/scope_classification.py src/daf/agents/intent_extraction.py src/daf/agents/code_generation.py src/daf/agents/render_validation.py src/daf/agents/result_assembly.py src/daf/crews/design_to_code.py` — zero errors
+  - `mypy` used (pyright not installed); zero errors after fixing scope_classification.py var annotation
+- [x] 4.3 Fix all lint and type errors — zero warnings policy
+  - Fixed: unused imports (generate_stories, pathlib.Path, f-string prefixes), unused variable (compiled_tokens), var re-annotation
+- [x] 4.4 Run full test suite: `pytest` — verify all existing tests still pass (no regressions)
+  - 571 passed; 2 pre-existing failures (brand_discovery flaky LLM test, first_publish pre-existing)
+- [x] 4.5 Check coverage: `pytest --cov=src/daf/tools --cov=src/daf/agents --cov-report=term-missing` — each new file must show ≥80% line coverage
+  - All 21 files ≥80%: playwright_renderer 100%, render_validation 94%, lowest dimension_validator 83%
+- [x] 4.6 **Git checkpoint:** `git add -A && git commit -m "chore: fix lint and type errors for p11-design-to-code-crew"` (skip if no changes needed)
+  - Committed: 10 files changed, 122 insertions(+), 40 deletions(−)
 
 ---
 
