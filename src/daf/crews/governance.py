@@ -8,8 +8,6 @@ absent or empty, as the Quality Gate Agent depends on Documentation Crew output.
 """
 from __future__ import annotations
 
-import json
-import os
 from pathlib import Path
 
 from crewai import Crew, Task
@@ -114,7 +112,7 @@ def create_governance_crew(output_dir: str) -> Crew:
 
     t5_quality_gate = Task(
         description=(
-            f"Read reports/quality-scorecard.json and the docs/ directory. "
+            "Read reports/quality-scorecard.json and the docs/ directory. "
             "Evaluate five quality gates (coverage ≥ 80%, zero a11y critical violations, "
             "no phantom token refs, all components have docs, all have usage examples) "
             "per component. Write governance/quality-gates.json. "

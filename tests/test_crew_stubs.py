@@ -40,21 +40,8 @@ CREW_OUTPUT_SPECS = [
             "docs/decisions/generation-narrative.md",
         ],
     ),
-    (
-        "daf.crews.governance",
-        "create_governance_crew",
-        [
-            "governance/ownership.json",
-            "governance/quality-gates.json",
-            "governance/deprecation-policy.json",
-            "governance/workflow.json",
-            "docs/templates/rfc-template.md",
-            "tests/tokens.test.ts",
-            "tests/a11y.test.ts",
-            "tests/composition.test.ts",
-            "tests/compliance.test.ts",
-        ],
-    ),
+    # governance crew graduated from StubCrew to real crewai.Crew in p14;
+    # its contract is tested in tests/test_governance_crew.py instead.
     (
         "daf.crews.ai_semantic_layer",
         "create_ai_semantic_layer_crew",
