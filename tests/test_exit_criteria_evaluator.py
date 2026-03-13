@@ -549,7 +549,7 @@ def test_c9_fails_when_summary_absent(tmp_path: Path) -> None:
 def test_c10_passes_when_no_hardcoded_colors(tmp_path: Path) -> None:
     """_check_c10 passes when AstPatternMatcher returns no targets."""
     from daf.tools.exit_criteria_evaluator import ExitCriteriaEvaluator
-    with patch("daf.tools.exit_criteria_evaluator.AstPatternMatcher") as MockMatcher:
+    with patch("daf.tools.exit_criteria_evaluator.ASTPatternMatcher") as MockMatcher:
         mock_instance = MockMatcher.return_value
         mock_instance._run.return_value = {"targets": []}
         evaluator = ExitCriteriaEvaluator()
@@ -563,7 +563,7 @@ def test_c10_passes_when_no_hardcoded_colors(tmp_path: Path) -> None:
 def test_c10_fails_with_hardcoded_color_targets(tmp_path: Path) -> None:
     """_check_c10 fails when AstPatternMatcher returns hardcoded_color targets."""
     from daf.tools.exit_criteria_evaluator import ExitCriteriaEvaluator
-    with patch("daf.tools.exit_criteria_evaluator.AstPatternMatcher") as MockMatcher:
+    with patch("daf.tools.exit_criteria_evaluator.ASTPatternMatcher") as MockMatcher:
         mock_instance = MockMatcher.return_value
         mock_instance._run.return_value = {
             "targets": [{"type": "hardcoded_color", "pattern": "#333", "file": "Button.tsx", "line": 12}]

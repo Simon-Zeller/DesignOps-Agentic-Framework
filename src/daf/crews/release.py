@@ -131,14 +131,16 @@ def create_release_crew(output_dir: str) -> Crew:
 
     t6_final_status = Task(
         description=(
-            "Read reports/generation-summary.json and verify it contains a "
-            "final_status field. If the field is missing, write final_status: failed. "
-            "This is a defensive validation step — all prior tasks should have "
-            "already written this field."
+            f"Read {od / 'reports' / 'exit-criteria.json'} to determine isComplete. "
+            "Map the result to final_status using this three-way logic: "
+            "if isComplete is true and no warning criteria failed → final_status: 'success'; "
+            "if isComplete is true but some warning criteria failed → final_status: 'partial'; "
+            "if isComplete is false → final_status: 'failed'. "
+            "Write final_status to reports/generation-summary.json."
         ),
         expected_output=(
-            "reports/generation-summary.json confirmed to contain final_status. "
-            "A brief validation summary is returned."
+            "reports/generation-summary.json updated with final_status field "
+            "('success', 'partial', or 'failed') derived from reports/exit-criteria.json."
         ),
         agent=publish_agent,
     )

@@ -17,6 +17,7 @@ from daf.agents.workflow import create_workflow_agent
 from daf.agents.deprecation import create_deprecation_agent
 from daf.agents.rfc import create_rfc_agent
 from daf.agents.quality_gate import create_quality_gate_agent
+from daf.agents.exit_criteria import create_exit_criteria_agent
 
 _SONNET_MODEL = "claude-3-5-sonnet-20241022"
 _HAIKU_MODEL = "claude-3-5-haiku-20241022"
@@ -56,6 +57,7 @@ def create_governance_crew(output_dir: str) -> Crew:
     deprecation_agent = create_deprecation_agent(_HAIKU_MODEL, output_dir)
     rfc_agent = create_rfc_agent(_HAIKU_MODEL, output_dir)
     quality_gate_agent = create_quality_gate_agent(_HAIKU_MODEL, output_dir)
+    exit_criteria_agent = create_exit_criteria_agent(_HAIKU_MODEL, output_dir)
 
     # Define tasks T1–T5
     t1_ownership = Task(
@@ -126,6 +128,21 @@ def create_governance_crew(output_dir: str) -> Crew:
         agent=quality_gate_agent,
     )
 
+    t6_exit_criteria = Task(
+        description=(
+            f"Run all 15 §8 exit criteria checks against {output_dir}. "
+            "Evaluate token JSON validity, DTCG conformance, reference resolution, "
+            "contrast ratios, CSS refs, TypeScript compilation, npm build, "
+            "test results, and governance report scores. "
+            "Write the structured report to reports/exit-criteria.json."
+        ),
+        expected_output=(
+            "JSON file at reports/exit-criteria.json with isComplete flag and "
+            "all 15 criterion results (id, description, severity, passed, detail)."
+        ),
+        agent=exit_criteria_agent,
+    )
+
     return Crew(
         agents=[
             ownership_agent,
@@ -133,8 +150,9 @@ def create_governance_crew(output_dir: str) -> Crew:
             deprecation_agent,
             rfc_agent,
             quality_gate_agent,
+            exit_criteria_agent,
         ],
-        tasks=[t1_ownership, t2_workflow, t3_deprecation, t4_rfc, t5_quality_gate],
+        tasks=[t1_ownership, t2_workflow, t3_deprecation, t4_rfc, t5_quality_gate, t6_exit_criteria],
         verbose=False,
     )
 
