@@ -42,11 +42,13 @@ def test_normalises_valid_tier_files_to_staged_directory(valid_token_files):
     """Three valid DTCG files are staged into tokens/staged/."""
     from daf.agents.token_ingestion import create_token_ingestion_agent, create_token_ingestion_task
 
-    agent = create_token_ingestion_agent()
-    task = create_token_ingestion_task(output_dir=str(valid_token_files))
+    with patch("daf.agents.token_ingestion.Agent") as mock_agent_cls, \
+         patch("daf.agents.token_ingestion.Task") as mock_task_cls:
+        agent = create_token_ingestion_agent()
+        task = create_token_ingestion_task(output_dir=str(valid_token_files))
 
-    assert agent is not None
-    assert task is not None
+        assert agent is not None
+        assert task is not None
 
     # Directly exercise the ingestion logic (tool-level, without LLM)
     from daf.tools.dtcg_formatter import WC3DTCGFormatter
