@@ -28,3 +28,19 @@ def test_crew_instantiates_when_component_index_present(tmp_path):
 
     crew = create_governance_crew(str(tmp_path))
     assert crew is not None
+
+
+def test_governance_crew_includes_exit_criteria_task(tmp_path):
+    """Governance crew has a task referencing exit-criteria.json after quality gate."""
+    from daf.crews.governance import create_governance_crew
+
+    docs_dir = tmp_path / "docs"
+    docs_dir.mkdir(parents=True)
+    (docs_dir / "component-index.json").write_text(json.dumps({"Button": {}}))
+
+    crew = create_governance_crew(str(tmp_path))
+
+    descriptions = [t.description for t in crew.tasks]
+    assert any("exit-criteria.json" in d or "exit criteria" in d.lower() for d in descriptions), (
+        f"No exit-criteria task found. Task descriptions: {descriptions}"
+    )

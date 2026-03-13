@@ -94,3 +94,15 @@ def test_crew_does_not_include_rollback_agent(tmp_path: Path) -> None:
         role_lower = agent.role.lower()
         assert "rollback" not in role_lower
         assert "checkpoint manager" not in role_lower
+
+
+def test_t6_references_exit_criteria_json(tmp_path: Path) -> None:
+    """t6_final_status task description references exit-criteria.json."""
+    _make_output_dir(tmp_path)
+    from daf.crews.release import create_release_crew
+
+    crew = create_release_crew(str(tmp_path))
+    t6 = crew.tasks[-1]
+    assert "exit-criteria.json" in t6.description, (
+        f"t6_final_status description does not mention exit-criteria.json: {t6.description!r}"
+    )
