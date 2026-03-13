@@ -44,13 +44,8 @@ CREW_OUTPUT_SPECS = [
     # its contract is tested in tests/test_governance_crew.py instead.
     # ai_semantic_layer crew graduated from StubCrew to real crewai.Crew in p16;
     # its contract is tested in tests/test_ai_semantic_layer_crew.py instead.
-    (
-        "daf.crews.release",
-        "create_release_crew",
-        [
-            "package.json",
-        ],
-    ),
+    # release crew graduated from StubCrew to real crewai.Crew in p17;
+    # its contract is tested in tests/test_release_crew.py instead.
 ]
 
 

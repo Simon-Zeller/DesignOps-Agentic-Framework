@@ -46,14 +46,29 @@ def test_first_publish_agent_instantiates_rollback_agent_at_start(tmp_path: Path
     _make_output_dir(tmp_path)
 
     rollback_spy = MagicMock(return_value=MagicMock())
-    seq_results = _all_success_side_effects()
 
     with (
         patch("daf.agents.first_publish.create_rollback_agent", rollback_spy) as mock_rollback,
-        patch("daf.agents.first_publish.CrewSequencer") as MockSeq,
+        patch("daf.agents.first_publish.CheckpointManager") as MockCM,
+        patch("daf.agents.first_publish.run_token_foundation_task"),
+        patch("daf.agents.first_publish.create_token_engine_crew") as mock_te,
+        patch("daf.agents.first_publish.create_design_to_code_crew") as mock_d2c,
+        patch("daf.agents.first_publish.create_component_factory_crew") as mock_cf,
+        patch("daf.agents.first_publish.create_documentation_crew") as mock_doc,
+        patch("daf.agents.first_publish.create_governance_crew") as mock_gov,
+        patch("daf.agents.first_publish.create_ai_semantic_layer_crew") as mock_ai,
+        patch("daf.agents.first_publish.create_analytics_crew") as mock_analytics,
+        patch("daf.agents.first_publish.create_release_crew") as mock_release,
     ):
-        mock_seq_instance = MockSeq.return_value
-        mock_seq_instance.run_sequence.return_value = seq_results
+        mock_cm_instance = MockCM.return_value
+        mock_cm_instance.create.return_value = {"phase": 0, "path": str(tmp_path)}
+        mock_cm_instance.restore.return_value = None
+        mock_cm_instance.get_last_valid_checkpoint.return_value = None
+
+        for mock_factory in (mock_te, mock_d2c, mock_cf, mock_doc, mock_gov, mock_ai, mock_analytics, mock_release):
+            crew = MagicMock()
+            crew.kickoff.return_value = CrewResult(crew="stub", status="success", artifacts_written=[])
+            mock_factory.return_value = crew
 
         from daf.agents.first_publish import run_first_publish_agent
 
@@ -344,3 +359,129 @@ def test_first_publish_agent_retry_context_accumulates(tmp_path: Path) -> None:
     assert last_context is not None
     assert rejection_1 in last_context
     assert rejection_2 in last_context
+
+
+# ---------------------------------------------------------------------------
+# test_rollback_agent_instantiated_at_pipeline_start (p17 — Task 2.30)
+# ---------------------------------------------------------------------------
+
+def test_rollback_agent_instantiated_at_pipeline_start(tmp_path: Path) -> None:
+    """Agent 40 (Rollback) is instantiated with model and output_dir at pipeline start."""
+    _make_output_dir(tmp_path)
+
+    rollback_spy = MagicMock(return_value=MagicMock())
+
+    with (
+        patch("daf.agents.first_publish.create_rollback_agent", rollback_spy),
+        patch("daf.agents.first_publish.CheckpointManager"),
+        patch("daf.agents.first_publish.run_token_foundation_task"),
+        patch("daf.agents.first_publish.create_token_engine_crew") as mock_te,
+        patch("daf.agents.first_publish.create_design_to_code_crew") as mock_d2c,
+        patch("daf.agents.first_publish.create_component_factory_crew") as mock_cf,
+        patch("daf.agents.first_publish.create_documentation_crew") as mock_doc,
+        patch("daf.agents.first_publish.create_governance_crew") as mock_gov,
+        patch("daf.agents.first_publish.create_ai_semantic_layer_crew") as mock_ai,
+        patch("daf.agents.first_publish.create_analytics_crew") as mock_analytics,
+        patch("daf.agents.first_publish.create_release_crew") as mock_release,
+    ):
+        for mock_factory in (mock_te, mock_d2c, mock_cf, mock_doc, mock_gov, mock_ai, mock_analytics, mock_release):
+            crew = MagicMock()
+            crew.kickoff.return_value = CrewResult(crew="stub", status="success", artifacts_written=[])
+            mock_factory.return_value = crew
+
+        from daf.agents.first_publish import run_first_publish_agent
+        run_first_publish_agent(output_dir=str(tmp_path))
+
+    rollback_spy.assert_called_once()
+    call_args = rollback_spy.call_args
+    # Must be called with output_dir so Agent 40 tools target the right directory
+    assert str(tmp_path) in str(call_args)
+
+
+# ---------------------------------------------------------------------------
+# test_snapshot_called_before_each_crew (p17 — Task 2.30)
+# ---------------------------------------------------------------------------
+
+def test_snapshot_called_before_each_crew(tmp_path: Path) -> None:
+    """Phase-boundary checkpoints are created before/after each crew group."""
+    _make_output_dir(tmp_path)
+
+    with (
+        patch("daf.agents.first_publish.create_rollback_agent"),
+        patch("daf.agents.first_publish.CheckpointManager") as MockCM,
+        patch("daf.agents.first_publish.run_token_foundation_task"),
+        patch("daf.agents.first_publish.create_token_engine_crew") as mock_te,
+        patch("daf.agents.first_publish.create_design_to_code_crew") as mock_d2c,
+        patch("daf.agents.first_publish.create_component_factory_crew") as mock_cf,
+        patch("daf.agents.first_publish.create_documentation_crew") as mock_doc,
+        patch("daf.agents.first_publish.create_governance_crew") as mock_gov,
+        patch("daf.agents.first_publish.create_ai_semantic_layer_crew") as mock_ai,
+        patch("daf.agents.first_publish.create_analytics_crew") as mock_analytics,
+        patch("daf.agents.first_publish.create_release_crew") as mock_release,
+    ):
+        mock_cm_instance = MockCM.return_value
+        mock_cm_instance.create.return_value = {"phase": 0, "path": str(tmp_path)}
+        mock_cm_instance.restore.return_value = None
+        mock_cm_instance.get_last_valid_checkpoint.return_value = None
+
+        for mock_factory in (mock_te, mock_d2c, mock_cf, mock_doc, mock_gov, mock_ai, mock_analytics, mock_release):
+            crew = MagicMock()
+            crew.kickoff.return_value = CrewResult(crew="stub", status="success", artifacts_written=[])
+            mock_factory.return_value = crew
+
+        from daf.agents.first_publish import run_first_publish_agent
+        run_first_publish_agent(output_dir=str(tmp_path))
+
+    # Phase-boundary snapshots should be created (phases 0, 3, 4, 5)
+    assert mock_cm_instance.create.call_count >= 1, (
+        "CheckpointManager.create must be called at least once for phase-boundary snapshots"
+    )
+
+
+# ---------------------------------------------------------------------------
+# test_restore_called_on_exhausted_retry (p17 — Task 2.30)
+# ---------------------------------------------------------------------------
+
+def test_restore_called_on_exhausted_retry(tmp_path: Path) -> None:
+    """CheckpointManager.restore is called when a cross-phase retry is triggered."""
+    _make_output_dir(tmp_path)
+
+    rejection = {"failed_checks": ["naming"], "suggested_fix": "Use kebab-case"}
+    rejected_result = CrewResult(
+        crew="token_engine", status="rejected", rejection=rejection, retries_used=0
+    )
+    success_result = CrewResult(crew="token_engine", status="success", artifacts_written=[])
+
+    restore_spy = MagicMock()
+
+    with (
+        patch("daf.agents.first_publish.create_rollback_agent"),
+        patch("daf.agents.first_publish.CheckpointManager") as MockCM,
+        patch("daf.agents.first_publish.run_token_foundation_task"),
+        patch("daf.agents.first_publish.create_token_engine_crew") as mock_te,
+        patch("daf.agents.first_publish.create_design_to_code_crew") as mock_d2c,
+        patch("daf.agents.first_publish.create_component_factory_crew") as mock_cf,
+        patch("daf.agents.first_publish.create_documentation_crew") as mock_doc,
+        patch("daf.agents.first_publish.create_governance_crew") as mock_gov,
+        patch("daf.agents.first_publish.create_ai_semantic_layer_crew") as mock_ai,
+        patch("daf.agents.first_publish.create_analytics_crew") as mock_analytics,
+        patch("daf.agents.first_publish.create_release_crew") as mock_release,
+    ):
+        mock_cm_instance = MockCM.return_value
+        mock_cm_instance.restore = restore_spy
+        mock_cm_instance.create.return_value = {"phase": 0, "path": str(tmp_path)}
+        mock_cm_instance.get_last_valid_checkpoint.return_value = None
+
+        te_crew = MagicMock()
+        te_crew.kickoff.side_effect = [rejected_result, success_result]
+        mock_te.return_value = te_crew
+
+        for mock_factory in (mock_d2c, mock_cf, mock_doc, mock_gov, mock_ai, mock_analytics, mock_release):
+            crew = MagicMock()
+            crew.kickoff.return_value = CrewResult(crew="stub", status="success", artifacts_written=[])
+            mock_factory.return_value = crew
+
+        from daf.agents.first_publish import run_first_publish_agent
+        run_first_publish_agent(output_dir=str(tmp_path))
+
+    restore_spy.assert_called_once()

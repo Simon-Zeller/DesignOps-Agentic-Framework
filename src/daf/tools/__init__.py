@@ -58,6 +58,20 @@ from daf.tools.rule_compiler import RuleCompiler
 from daf.tools.context_formatter import ContextFormatter
 from daf.tools.token_budget_optimizer import TokenBudgetOptimizer
 from daf.tools.multi_format_serializer import MultiFormatSerializer
+from daf.tools.gate_status_reader import GateStatusReader
+from daf.tools.version_calculator import VersionCalculator
+from daf.tools.component_inventory_reader import ComponentInventoryReader
+from daf.tools.quality_report_parser import QualityReportParser
+from daf.tools.ast_pattern_matcher import ASTPatternMatcher
+from daf.tools.codemod_template_generator import CodemodTemplateGenerator
+from daf.tools.example_suite_builder import ExampleSuiteBuilder
+from daf.tools.package_json_generator import PackageJsonGenerator
+from daf.tools.dependency_resolver import DependencyResolver
+from daf.tools.test_result_parser import TestResultParser
+from daf.tools.checkpoint_creator import CheckpointCreator
+from daf.tools.restore_executor import RestoreExecutor
+from daf.tools.rollback_reporter import RollbackReporter
+from daf.tools.prose_generator import ProseGenerator
 
 __all__ = [
     "ArchetypeResolver",
@@ -122,4 +136,18 @@ __all__ = [
     "ContextFormatter",
     "TokenBudgetOptimizer",
     "MultiFormatSerializer",
+    "GateStatusReader",
+    "VersionCalculator",
+    "ComponentInventoryReader",
+    "QualityReportParser",
+    "ASTPatternMatcher",
+    "CodemodTemplateGenerator",
+    "ExampleSuiteBuilder",
+    "PackageJsonGenerator",
+    "DependencyResolver",
+    "TestResultParser",
+    "CheckpointCreator",
+    "RestoreExecutor",
+    "RollbackReporter",
+    "ProseGenerator",
 ]

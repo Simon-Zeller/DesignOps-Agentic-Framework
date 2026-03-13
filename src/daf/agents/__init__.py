@@ -86,6 +86,11 @@ from daf.agents.token_resolution import create_token_resolution_agent
 from daf.agents.composition_constraint import create_composition_constraint_agent
 from daf.agents.validation_rule import create_validation_rule_agent
 from daf.agents.context_serializer import create_context_serializer_agent
+from daf.agents.semver import create_semver_agent
+from daf.agents.release_changelog import create_release_changelog_agent
+from daf.agents.codemod import create_codemod_agent
+from daf.agents.publish import create_publish_agent
+from daf.agents.rollback import create_rollback_agent
 
 __all__ += [
     "run_spec_validation",
@@ -107,4 +112,9 @@ __all__ += [
     "create_composition_constraint_agent",
     "create_validation_rule_agent",
     "create_context_serializer_agent",
+    "create_semver_agent",
+    "create_release_changelog_agent",
+    "create_codemod_agent",
+    "create_publish_agent",
+    "create_rollback_agent",
 ]

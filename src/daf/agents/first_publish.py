@@ -45,6 +45,7 @@ MAX_PHASE46_RETRIES = 2   # Phases 4–6 crews get 2 attempts
 # Phase numbers for retry-category logic
 _CRITICAL_PHASE_CREWS = {"token_engine", "design_to_code", "component_factory"}
 
+_HAIKU_MODEL = "claude-3-5-haiku-20241022"
 
 def create_first_publish_agent() -> Agent:
     """Instantiate Agent 6: First Publish Agent (Tier 2 — Claude Sonnet)."""
@@ -102,7 +103,7 @@ def run_first_publish_agent(
     aggregator = ResultAggregator()
 
     # Agent 40 must be instantiated before the first crew runs (per design.md)
-    _rollback_agent = create_rollback_agent()
+    _rollback_agent = create_rollback_agent(_HAIKU_MODEL, output_dir)
 
     results: list[CrewResult] = []
 
