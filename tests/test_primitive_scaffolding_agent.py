@@ -23,12 +23,12 @@ def test_primitive_spec_generator_tool_is_base_tool_subclass() -> None:
 
 
 def test_primitive_spec_generator_tool_name() -> None:
-    assert PrimitiveSpecGenerator.name == "PrimitiveSpecGenerator"
+    assert PrimitiveSpecGenerator().name == "PrimitiveSpecGenerator"
 
 
 def test_primitive_spec_generator_tool_run_produces_files(tmp_path: Path) -> None:
     tool = PrimitiveSpecGenerator()
-    result = tool.run({"output_dir": str(tmp_path)})
+    result = tool.run(output_dir=str(tmp_path))
     assert isinstance(result, str) and result, "Tool run should return a non-empty string"
     yaml_files = list((tmp_path / "specs").glob("*.spec.yaml"))
     assert len(yaml_files) == 11, (
