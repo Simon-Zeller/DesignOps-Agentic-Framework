@@ -90,7 +90,7 @@ rules:
     - Group tasks by crew/phase alignment (Phase 1 before Phase 2, etc.)
     - Include lint and type-check tasks after implementation
     - Include git workflow steps (branch, commit, push)
-    - Every major section (red, green, refactor, quality) MUST end with a git checkpoint: `git add -A && git commit`
+    - "Every major section (red, green, refactor, quality) MUST end with a git checkpoint: `git add -A && git commit`"
     - Before moving to the next section, verify `git status` shows zero untracked files
     - Tag tasks that require changes to crew I/O contracts or pipeline-config.json schema
     - Keep individual tasks completable in one focused session
