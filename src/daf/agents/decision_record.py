@@ -6,7 +6,7 @@ Generates one ADR per significant generation decision found in
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from daf.tools.decision_extractor import extract_decisions
 from daf.tools.adr_template_generator import generate_adr, slugify_title
@@ -19,7 +19,7 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
 
 
 def _load_json(path: Path) -> dict[str, Any]:
-    return _load_json_helper(path)
+    return cast(dict[str, Any], _load_json_helper(path))
 
 
 def run_decision_records(output_dir: str) -> None:

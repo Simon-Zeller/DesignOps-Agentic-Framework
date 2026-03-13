@@ -6,9 +6,9 @@ Reads ``specs/*.spec.yaml`` and ``tokens/semantic.tokens.json``.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 from daf.tools.spec_to_doc_renderer import render_spec_to_sections
 from daf.tools.prop_table_generator import generate_prop_table
@@ -24,7 +24,7 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
 
 
 def _load_json(path: Path) -> dict[str, Any]:
-    return _load_json_helper(path)
+    return cast(dict[str, Any], _load_json_helper(path))
 
 
 def run_doc_generation(output_dir: str) -> None:

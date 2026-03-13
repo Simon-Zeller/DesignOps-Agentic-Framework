@@ -6,7 +6,7 @@ of why the design system looks the way it does.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from daf.tools.brand_profile_analyzer import analyze_brand_profile
 from daf.tools.decision_log_reader import read_decisions
@@ -20,7 +20,7 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
 
 
 def _load_json(path: Path) -> dict[str, Any]:
-    return _load_json_helper(path)
+    return cast(dict[str, Any], _load_json_helper(path))
 
 
 def run_generation_narrative(output_dir: str) -> None:

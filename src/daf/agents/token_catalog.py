@@ -6,7 +6,7 @@ tier classification, visual representation, and LLM-generated usage context.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from daf.tools.token_value_resolver import resolve_token, classify_tier
 from daf.tools.scale_visualizer import visualize_token
@@ -20,7 +20,7 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
 
 
 def _load_json(path: Path) -> dict[str, Any]:
-    return _load_json_helper(path)
+    return cast(dict[str, Any], _load_json_helper(path))
 
 
 def run_token_catalog(output_dir: str) -> None:
