@@ -99,6 +99,6 @@
 
 - [x] 12.1 Push feature branch: `git push origin feat/p05-theming-model`
 - [x] 12.2 Open pull request targeting `main` with title: `feat: p05 theming model — DTCG extension convention, compilation strategy, ThemeProvider spec` → https://github.com/Simon-Zeller/DesignOps-Agentic-Framework/pull/1
-- [ ] 12.3 After PR approval and merge: `git checkout main && git pull origin main`
-- [ ] 12.4 Delete feature branch locally: `git branch -d feat/p05-theming-model`
-- [ ] 12.5 Delete feature branch remotely: `git push origin --delete feat/p05-theming-model`
+- [x] 12.3 After PR approval and merge: `git checkout main && git pull origin main`
+- [x] 12.4 Delete feature branch locally: `git branch -d feat/p05-theming-model`
+- [x] 12.5 Delete feature branch remotely: `git push origin --delete feat/p05-theming-model`

@@ -150,7 +150,8 @@ The `WC3DTCGFormatter` tool MUST serialize the assembled token data into three v
 - [ ] `tokens/semantic.tokens.json` contains only reference-valued tokens (`$value: "{group.token.step}"`) — no raw hex values in the semantic tier
 - [ ] `tokens/component.tokens.json` contains component-scoped tokens referencing semantic tokens
 - [ ] Every token object has `$value`, `$type`, and `$description` fields
-- [ ] Semantic tokens for multi-theme profiles include `$extensions.themes` mapping theme mode names to resolved alias references
+- [ ] Semantic tokens for multi-theme profiles include `$extensions.com.daf.themes` mapping theme mode names to resolved alias references (key MUST be `com.daf.themes` — bare `themes` key is invalid)
+- [ ] Raises `ValueError` with the token path and broken reference string if any reference is unresolvable (via `com.daf.themes` self-check pass)
 - [ ] All `{...}` reference strings in semantic/component tiers resolve against the global-tier dict before files are written (self-check pass)
 - [ ] Raises `ValueError` with the token path and broken reference string if any reference is unresolvable
 - [ ] Creates the `tokens/` directory if it does not exist
@@ -178,14 +179,15 @@ The `WC3DTCGFormatter` tool MUST serialize the assembled token data into three v
 - THEN it raises `ValueError` before writing any file
 - AND the error message identifies the token path and the unresolvable reference string
 
-#### Scenario: Multi-theme semantic tokens include `$extensions.themes`
+#### Scenario: Multi-theme semantic tokens include `$extensions.com.daf.themes`
 
 - GIVEN a profile with `themes.modes: ["light", "dark"]` and theme-aware semantic alias overrides
 - WHEN `WC3DTCGFormatter` runs
 - THEN each affected semantic token in `tokens/semantic.tokens.json` includes:
   ```json
-  "$extensions": { "themes": { "light": "{color.neutral.50}", "dark": "{color.neutral.950}" } }
+  "$extensions": { "com.daf.themes": { "light": "{color.neutral.50}", "dark": "{color.neutral.950}" } }
   ```
+- AND using the bare `"themes"` key (without the `com.daf` namespace) raises a `ValueError` before any file is written
 
 ---
 
