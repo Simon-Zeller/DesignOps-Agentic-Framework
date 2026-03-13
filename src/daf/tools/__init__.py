@@ -11,6 +11,8 @@ from daf.tools.core_component_spec_generator import (
 from daf.tools.default_filler import DefaultFiller
 from daf.tools.dtcg_formatter import WC3DTCGFormatter
 from daf.tools.modular_scale_calculator import ModularScaleCalculator
+from daf.tools.config_generator import ConfigGenerator
+from daf.tools.project_scaffolder import ProjectScaffolder
 
 __all__ = [
     "ArchetypeResolver",
@@ -23,4 +25,6 @@ __all__ = [
     "WC3DTCGFormatter",
     "ModularScaleCalculator",
     "generate_component_specs",
+    "ConfigGenerator",
+    "ProjectScaffolder",
 ]

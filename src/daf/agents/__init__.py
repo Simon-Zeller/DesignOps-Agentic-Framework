@@ -17,6 +17,10 @@ from daf.agents.core_component import (
     create_core_component_agent,
     create_core_component_task,
 )
+from daf.agents.pipeline_config import (
+    create_pipeline_config_agent,
+    create_pipeline_config_task,
+)
 
 __all__ = [
     "create_brand_discovery_agent",
@@ -29,4 +33,6 @@ __all__ = [
     "create_primitive_scaffolding_task",
     "create_core_component_agent",
     "create_core_component_task",
+    "create_pipeline_config_agent",
+    "create_pipeline_config_task",
 ]

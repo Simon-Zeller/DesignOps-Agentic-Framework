@@ -13,12 +13,13 @@ import pytest
 # Agent factory tests
 # ---------------------------------------------------------------------------
 
-def test_create_agent_returns_agent_with_correct_role():
+def test_create_agent_returns_agent_with_correct_role(monkeypatch):
     from crewai import Agent
     from daf.agents.pipeline_config import create_pipeline_config_agent
     from daf.tools.config_generator import ConfigGenerator
     from daf.tools.project_scaffolder import ProjectScaffolder
 
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     agent = create_pipeline_config_agent()
     assert isinstance(agent, Agent)
     assert agent.role == "Pipeline Configuration Agent"
@@ -28,12 +29,17 @@ def test_create_agent_returns_agent_with_correct_role():
 
 
 def test_create_agent_uses_tier2_model_env_var(monkeypatch):
+    from unittest.mock import MagicMock, patch
     from daf.agents.pipeline_config import create_pipeline_config_agent
 
     monkeypatch.setenv("DAF_TIER2_MODEL", "claude-sonnet-4-custom")
-    agent = create_pipeline_config_agent()
-    # llm attribute may be a string or an LLM object; coerce to string for check
-    assert "claude-sonnet-4-custom" in str(agent.llm)
+
+    # Patch Agent constructor to avoid LLM instantiation without API key
+    with patch("daf.agents.pipeline_config.Agent") as MockAgent:
+        MockAgent.return_value = MagicMock()
+        create_pipeline_config_agent()
+        _, kwargs = MockAgent.call_args
+        assert kwargs.get("llm") == "claude-sonnet-4-custom"
 
 
 # ---------------------------------------------------------------------------
@@ -51,18 +57,22 @@ def test_create_task_returns_task_instance():
 
 
 def test_create_task_includes_context_tasks():
-    from unittest.mock import MagicMock
+    from unittest.mock import patch
     from crewai import Task
     from daf.agents.pipeline_config import create_pipeline_config_task
 
-    mock_task = MagicMock(spec=Task)
+    # Create a real minimal Task to use as context (MagicMock fails crewai validation)
+    upstream_task = Task(
+        description="Upstream task for context",
+        expected_output="output",
+    )
     task = create_pipeline_config_task(
         output_dir=".",
         brand_profile_path="./brand-profile.json",
-        context_tasks=[mock_task],
+        context_tasks=[upstream_task],
     )
     assert task.context is not None
-    assert mock_task in task.context
+    assert upstream_task in task.context
 
 
 # ---------------------------------------------------------------------------
