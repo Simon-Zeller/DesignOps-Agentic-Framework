@@ -81,6 +81,11 @@ from daf.agents.token_compliance_agent import create_token_compliance_agent
 from daf.agents.drift_detection import create_drift_detection_agent
 from daf.agents.pipeline_completeness import create_pipeline_completeness_agent
 from daf.agents.breakage_correlation import create_breakage_correlation_agent
+from daf.agents.registry_maintenance import create_registry_maintenance_agent
+from daf.agents.token_resolution import create_token_resolution_agent
+from daf.agents.composition_constraint import create_composition_constraint_agent
+from daf.agents.validation_rule import create_validation_rule_agent
+from daf.agents.context_serializer import create_context_serializer_agent
 
 __all__ += [
     "run_spec_validation",
@@ -97,4 +102,9 @@ __all__ += [
     "create_drift_detection_agent",
     "create_pipeline_completeness_agent",
     "create_breakage_correlation_agent",
+    "create_registry_maintenance_agent",
+    "create_token_resolution_agent",
+    "create_composition_constraint_agent",
+    "create_validation_rule_agent",
+    "create_context_serializer_agent",
 ]
