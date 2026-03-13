@@ -76,6 +76,11 @@ from daf.agents.token_catalog import run_token_catalog
 from daf.agents.generation_narrative import run_generation_narrative
 from daf.agents.decision_record import run_decision_records
 from daf.agents.search_index import run_search_index
+from daf.agents.usage_tracking import create_usage_tracking_agent
+from daf.agents.token_compliance_agent import create_token_compliance_agent
+from daf.agents.drift_detection import create_drift_detection_agent
+from daf.agents.pipeline_completeness import create_pipeline_completeness_agent
+from daf.agents.breakage_correlation import create_breakage_correlation_agent
 
 __all__ += [
     "run_spec_validation",
@@ -87,4 +92,9 @@ __all__ += [
     "run_generation_narrative",
     "run_decision_records",
     "run_search_index",
+    "create_usage_tracking_agent",
+    "create_token_compliance_agent",
+    "create_drift_detection_agent",
+    "create_pipeline_completeness_agent",
+    "create_breakage_correlation_agent",
 ]

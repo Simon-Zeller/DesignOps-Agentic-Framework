@@ -1,8 +1,6 @@
 """Unit tests for ASTImportScanner tool."""
 from __future__ import annotations
 
-from pathlib import Path
-
 
 def test_ast_import_scanner_returns_empty_for_missing_src_dir(tmp_path):
     """Returns empty imports list when src/ does not exist — no exception raised."""
