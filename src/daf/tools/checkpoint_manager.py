@@ -6,7 +6,6 @@ the pipeline can resume from any phase boundary after a process crash.
 from __future__ import annotations
 
 import json
-import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -130,7 +129,6 @@ class CheckpointManager(BaseTool):
                 )
 
         # Overwrite output_dir with snapshot contents (skip .daf-checkpoints)
-        checkpoints_root = od / CHECKPOINTS_DIR
         for item in od.iterdir():
             if item.name == CHECKPOINTS_DIR:
                 continue

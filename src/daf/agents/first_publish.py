@@ -32,7 +32,10 @@ from daf.crews.governance import create_governance_crew
 from daf.crews.release import create_release_crew
 from daf.crews.token_engine import create_token_engine_crew
 from daf.tools.checkpoint_manager import CheckpointManager
-from daf.tools.crew_sequencer import CrewResult, CrewSequencer  # noqa: F401 (CrewSequencer imported for monkeypatching in tests)
+from daf.tools.crew_sequencer import (  # noqa: F401 (CrewSequencer imported for monkeypatching in tests)
+    CrewResult,
+    CrewSequencer,
+)
 from daf.tools.result_aggregator import ResultAggregator
 from daf.tools.status_reporter import StatusReporter
 

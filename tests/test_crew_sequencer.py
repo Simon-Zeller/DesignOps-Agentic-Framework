@@ -1,11 +1,10 @@
 """Tests for CrewSequencer tool (p09-pipeline-orchestrator, TDD red phase)."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
-import pytest
 
 from daf.tools.crew_sequencer import CrewSequencer, CrewResult
 
@@ -303,8 +302,3 @@ def test_crew_sequencer_empty_required_input_list_does_not_block(tmp_path: Path)
     # If no crew has empty required inputs, trivially pass
     pass
 
-
-# ---------------------------------------------------------------------------
-# Type hint helper (avoid bare Any at module level)
-# ---------------------------------------------------------------------------
-from typing import Any  # noqa: E402

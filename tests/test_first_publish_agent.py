@@ -3,9 +3,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock, call, patch, PropertyMock
+from unittest.mock import MagicMock, patch
 
-import pytest
 
 from daf.tools.crew_sequencer import CrewResult
 
@@ -84,12 +83,6 @@ def test_first_publish_agent_retries_phase2_on_rejection(tmp_path: Path) -> None
 
     checkpoint_restore_spy = MagicMock()
     run_token_foundation_spy = MagicMock(return_value=None)
-
-    other_success = [
-        CrewResult(crew=n, status="success", artifacts_written=[])
-        for n in ("design_to_code", "component_factory", "documentation",
-                  "governance", "ai_semantic_layer", "analytics", "release")
-    ]
 
     with (
         patch("daf.agents.first_publish.create_rollback_agent"),

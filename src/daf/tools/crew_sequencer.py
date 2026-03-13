@@ -14,7 +14,6 @@ from typing import Any
 from crewai.tools import BaseTool
 from pydantic import Field as PydanticField
 
-
 # ---------------------------------------------------------------------------
 # CrewResult dataclass
 # ---------------------------------------------------------------------------
