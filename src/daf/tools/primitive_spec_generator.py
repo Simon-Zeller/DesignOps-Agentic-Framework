@@ -730,7 +730,7 @@ class PrimitiveSpecGenerator(BaseTool):
     )
     args_schema: type[BaseModel] = _PrimitiveSpecGeneratorInput
 
-    def _run(self, output_dir: str = ".", **kwargs: Any) -> str:  # type: ignore[override]
+    def _run(self, output_dir: str = ".", **kwargs: Any) -> str:
         result = generate_all_primitive_specs(output_dir)
         n = len(result)
         specs_dir = str(Path(output_dir).resolve() / "specs")

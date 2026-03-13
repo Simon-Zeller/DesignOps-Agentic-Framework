@@ -7,6 +7,7 @@
 #   ./scripts/bootstrap.sh --from init        # start from interactive interview
 #   ./scripts/bootstrap.sh --from generate    # skip interview, run Agent 1 + gate
 #   ./scripts/bootstrap.sh --from tokens      # skip interview + Agent 1, generate tokens
+#   ./scripts/bootstrap.sh --from primitive-specs  # generate all 11 primitive spec YAMLs
 #   ./scripts/bootstrap.sh --profile <file>   # non-interactive: load profile, then generate
 #   ./scripts/bootstrap.sh --sample           # create a sample profile, then generate
 #
@@ -188,6 +189,20 @@ else:
   ok "Tokens generated"
 }
 
+# ── Stage: primitive-specs (Agent 3 — Primitive Scaffolding via PrimitiveSpecGenerator) ──
+stage_primitive_specs() {
+  info "Stage: primitive-specs — Primitive Scaffolding Agent (Agent 3) [deterministic, no LLM]"
+  cd "$WORKDIR"
+  uv run --project "$PROJECT_ROOT" python -c "
+from daf.tools.primitive_spec_generator import generate_all_primitive_specs
+result = generate_all_primitive_specs('$WORKDIR')
+print(f'Generated {len(result)} primitive specs in $WORKDIR/specs/')
+for name, path in result.items():
+    print(f'  • {name}: {path}')
+"
+  ok "Primitive specs generated in $WORKDIR/specs/"
+}
+
 # ── Orchestrate from the chosen stage ────────────────────────────────────────
 info "DAF Bootstrap — starting from stage: $FROM_STAGE"
 info "Workdir: $WORKDIR"
@@ -208,16 +223,22 @@ case "$FROM_STAGE" in
     stage_init
     stage_generate
     stage_tokens
+    stage_primitive_specs
     ;;
   generate)
     stage_generate
     stage_tokens
+    stage_primitive_specs
     ;;
   tokens)
     stage_tokens
+    stage_primitive_specs
+    ;;
+  primitive-specs)
+    stage_primitive_specs
     ;;
   *)
-    fail "Unknown stage: $FROM_STAGE (valid: init, generate, tokens)"
+    fail "Unknown stage: $FROM_STAGE (valid: init, generate, tokens, primitive-specs)"
     ;;
 esac
 
@@ -225,3 +246,4 @@ echo ""
 ok "Bootstrap complete. Output in $WORKDIR"
 echo "  brand-profile.json   — enriched brand profile"
 echo "  tokens/              — W3C DTCG token files (if generated)"
+echo "  specs/               — primitive spec YAMLs (if generated)"
