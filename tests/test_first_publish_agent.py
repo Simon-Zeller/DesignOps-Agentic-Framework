@@ -485,3 +485,308 @@ def test_restore_called_on_exhausted_retry(tmp_path: Path) -> None:
         run_first_publish_agent(output_dir=str(tmp_path))
 
     restore_spy.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# p18 – PRE-CREW-CHECKPOINT tests
+# ---------------------------------------------------------------------------
+
+def _full_patch_context(extra_patches=None):
+    """Return a list of patch targets for a full run_first_publish_agent test."""
+    return [
+        "daf.agents.first_publish.create_rollback_agent",
+        "daf.agents.first_publish.run_token_foundation_task",
+        "daf.agents.first_publish.create_token_engine_crew",
+        "daf.agents.first_publish.create_design_to_code_crew",
+        "daf.agents.first_publish.create_component_factory_crew",
+        "daf.agents.first_publish.create_documentation_crew",
+        "daf.agents.first_publish.create_governance_crew",
+        "daf.agents.first_publish.create_ai_semantic_layer_crew",
+        "daf.agents.first_publish.create_analytics_crew",
+        "daf.agents.first_publish.create_release_crew",
+    ]
+
+
+def _setup_all_success_crews(*mock_factories):
+    for mock_factory in mock_factories:
+        crew = MagicMock()
+        crew.kickoff.return_value = CrewResult(crew="stub", status="success", artifacts_written=[])
+        mock_factory.return_value = crew
+
+
+def test_run_simple_crew_creates_checkpoint_before_kickoff(tmp_path: Path) -> None:
+    """_run_simple_crew calls cm.create(output_dir, phase=2) before crew kickoff."""
+    from daf.agents.first_publish import _run_simple_crew, _CREW_PHASE_MAP
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.return_value = CR(crew="design_to_code", status="success", artifacts_written=[])
+
+    call_order = []
+    mock_cm.create.side_effect = lambda **kw: call_order.append("create")
+    crew.kickoff.side_effect = lambda: (call_order.append("kickoff"), CR(crew="design_to_code", status="success", artifacts_written=[]))[1]
+
+    factory = MagicMock(return_value=crew)
+    _run_simple_crew("design_to_code", factory, str(tmp_path), mock_reporter, cm=mock_cm, phase=2)
+
+    mock_cm.create.assert_called_once_with(output_dir=str(tmp_path), phase=2)
+    assert call_order.index("create") < call_order.index("kickoff"), "create must be called before kickoff"
+
+
+def test_run_simple_crew_still_calls_kickoff_after_checkpoint(tmp_path: Path) -> None:
+    """crew.kickoff() is called regardless of checkpoint creation succeeding."""
+    from daf.agents.first_publish import _run_simple_crew
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.return_value = CR(crew="design_to_code", status="success", artifacts_written=[])
+    factory = MagicMock(return_value=crew)
+
+    _run_simple_crew("design_to_code", factory, str(tmp_path), mock_reporter, cm=mock_cm, phase=2)
+
+    crew.kickoff.assert_called_once()
+
+
+def test_run_first_publish_passes_cm_and_phase_to_simple_crew(tmp_path: Path) -> None:
+    """run_first_publish_agent calls cm.create for Design-to-Code AND Component Factory."""
+    _make_output_dir(tmp_path)
+
+    with (
+        patch("daf.agents.first_publish.create_rollback_agent"),
+        patch("daf.agents.first_publish.CheckpointManager") as MockCM,
+        patch("daf.agents.first_publish.run_token_foundation_task"),
+        patch("daf.agents.first_publish.create_token_engine_crew") as mock_te,
+        patch("daf.agents.first_publish.create_design_to_code_crew") as mock_d2c,
+        patch("daf.agents.first_publish.create_component_factory_crew") as mock_cf,
+        patch("daf.agents.first_publish.create_documentation_crew") as mock_doc,
+        patch("daf.agents.first_publish.create_governance_crew") as mock_gov,
+        patch("daf.agents.first_publish.create_ai_semantic_layer_crew") as mock_ai,
+        patch("daf.agents.first_publish.create_analytics_crew") as mock_analytics,
+        patch("daf.agents.first_publish.create_release_crew") as mock_release,
+    ):
+        mock_cm_instance = MockCM.return_value
+        mock_cm_instance.create.return_value = {"phase": 0, "path": str(tmp_path)}
+        mock_cm_instance.restore.return_value = None
+        mock_cm_instance.get_last_valid_checkpoint.return_value = None
+
+        _setup_all_success_crews(mock_te, mock_d2c, mock_cf, mock_doc, mock_gov, mock_ai, mock_analytics, mock_release)
+
+        from daf.agents.first_publish import run_first_publish_agent, _CREW_PHASE_MAP
+        run_first_publish_agent(output_dir=str(tmp_path))
+
+    # create must have been called with phase corresponding to design_to_code and component_factory
+    d2c_phase = _CREW_PHASE_MAP["design_to_code"]
+    cf_phase = _CREW_PHASE_MAP["component_factory"]
+    create_phases = [call.kwargs.get("phase") for call in mock_cm_instance.create.call_args_list]
+    assert d2c_phase in create_phases, f"cm.create must be called with phase={d2c_phase} for design_to_code"
+    assert cf_phase in create_phases, f"cm.create must be called with phase={cf_phase} for component_factory"
+
+
+# ---------------------------------------------------------------------------
+# p18 – PRE-RETRY-RESTORE tests
+# ---------------------------------------------------------------------------
+
+def test_run_with_retry_creates_checkpoint_on_first_attempt(tmp_path: Path) -> None:
+    """_run_with_retry calls cm.create(phase=4) exactly once on attempt 1."""
+    from daf.agents.first_publish import _run_with_retry
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.side_effect = [
+        CR(crew="documentation", status="failed", artifacts_written=[]),
+        CR(crew="documentation", status="success", artifacts_written=[]),
+    ]
+    factory = MagicMock(return_value=crew)
+
+    _run_with_retry("documentation", factory, str(tmp_path), max_retries=2, reporter=mock_reporter, cm=mock_cm, phase=4)
+
+    assert mock_cm.create.call_count == 1
+    mock_cm.create.assert_called_once_with(output_dir=str(tmp_path), phase=4)
+
+
+def test_run_with_retry_restores_checkpoint_before_second_attempt(tmp_path: Path) -> None:
+    """cm.restore is called exactly once (before attempt 2) when attempt 1 fails."""
+    from daf.agents.first_publish import _run_with_retry
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.side_effect = [
+        CR(crew="documentation", status="failed", artifacts_written=[]),
+        CR(crew="documentation", status="success", artifacts_written=[]),
+    ]
+    factory = MagicMock(return_value=crew)
+
+    with patch("daf.agents.first_publish._cascade_invalidate"):
+        _run_with_retry("documentation", factory, str(tmp_path), max_retries=2, reporter=mock_reporter, cm=mock_cm, phase=4)
+
+    mock_cm.restore.assert_called_once_with(output_dir=str(tmp_path), phase=4)
+
+
+def test_run_with_retry_calls_cascade_invalidate_after_restore(tmp_path: Path) -> None:
+    """_cascade_invalidate(output_dir, 4) is called after restore and before retry kickoff."""
+    from daf.agents.first_publish import _run_with_retry
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.side_effect = [
+        CR(crew="documentation", status="failed", artifacts_written=[]),
+        CR(crew="documentation", status="success", artifacts_written=[]),
+    ]
+    factory = MagicMock(return_value=crew)
+
+    with patch("daf.agents.first_publish._cascade_invalidate") as mock_cascade:
+        _run_with_retry("documentation", factory, str(tmp_path), max_retries=2, reporter=mock_reporter, cm=mock_cm, phase=4)
+
+    mock_cascade.assert_called_once_with(str(tmp_path), 4)
+
+
+def test_run_with_retry_no_restore_on_first_attempt_success(tmp_path: Path) -> None:
+    """cm.restore is NOT called when attempt 1 succeeds."""
+    from daf.agents.first_publish import _run_with_retry
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.return_value = CR(crew="documentation", status="success", artifacts_written=[])
+    factory = MagicMock(return_value=crew)
+
+    result = _run_with_retry("documentation", factory, str(tmp_path), max_retries=2, reporter=mock_reporter, cm=mock_cm, phase=4)
+
+    mock_cm.restore.assert_not_called()
+    assert result.status == "success"
+    assert result.retries_used == 0
+
+
+def test_run_with_retry_restore_count_matches_retry_count(tmp_path: Path) -> None:
+    """cm.restore is called exactly once (before attempt 2) when max_retries=2 and all fail."""
+    from daf.agents.first_publish import _run_with_retry
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.return_value = CR(crew="documentation", status="failed", artifacts_written=[])
+    factory = MagicMock(return_value=crew)
+
+    with patch("daf.agents.first_publish._cascade_invalidate"):
+        result = _run_with_retry("documentation", factory, str(tmp_path), max_retries=2, reporter=mock_reporter, cm=mock_cm, phase=4)
+
+    assert mock_cm.restore.call_count == 1
+    assert result.retries_exhausted is True
+
+
+# ---------------------------------------------------------------------------
+# p18 – CASCADE-INVALIDATION tests
+# ---------------------------------------------------------------------------
+
+def test_cascade_invalidate_removes_phase_gt_n_dirs(tmp_path: Path) -> None:
+    """_cascade_invalidate(tmp_path, 0) removes all Phase 1+ artifact dirs."""
+    from daf.agents.first_publish import _cascade_invalidate, _PHASE_ARTIFACT_DIRS
+
+    # Create directories for phases > 0
+    created = []
+    for phase, paths in _PHASE_ARTIFACT_DIRS.items():
+        if phase > 0:
+            for p in paths:
+                d = tmp_path / p
+                d.mkdir(parents=True, exist_ok=True)
+                created.append(d)
+
+    _cascade_invalidate(str(tmp_path), 0)
+
+    for d in created:
+        assert not d.exists(), f"{d} should have been removed by cascade"
+
+
+def test_cascade_invalidate_preserves_earlier_phase_artifacts(tmp_path: Path) -> None:
+    """Phase 1–3 artifact dirs survive when _cascade_invalidate(tmp_path, 3) is called."""
+    from daf.agents.first_publish import _cascade_invalidate, _PHASE_ARTIFACT_DIRS
+
+    # Create dirs for phases 1, 2, 3, and 4
+    for phase, paths in _PHASE_ARTIFACT_DIRS.items():
+        for p in paths:
+            d = tmp_path / p
+            d.mkdir(parents=True, exist_ok=True)
+
+    _cascade_invalidate(str(tmp_path), 3)
+
+    # Phases 1–3 must still be present
+    for phase in (1, 2, 3):
+        for p in _PHASE_ARTIFACT_DIRS.get(phase, []):
+            d = tmp_path / p
+            assert d.exists(), f"Phase {phase} artifact {p} should survive cascade from phase 3"
+
+    # Phases > 3 must be removed
+    for phase, paths in _PHASE_ARTIFACT_DIRS.items():
+        if phase > 3:
+            for p in paths:
+                d = tmp_path / p
+                assert not d.exists(), f"Phase {phase} artifact {p} should be removed by cascade"
+
+
+def test_cascade_invalidate_silently_skips_missing_dirs(tmp_path: Path) -> None:
+    """_cascade_invalidate on an empty dir raises no exception."""
+    from daf.agents.first_publish import _cascade_invalidate
+
+    # Should not raise
+    _cascade_invalidate(str(tmp_path), 2)
+
+
+def test_cascade_invalidate_does_not_remove_checkpoint_dir(tmp_path: Path) -> None:
+    """The .daf-checkpoints/ directory is preserved by _cascade_invalidate."""
+    from daf.agents.first_publish import _cascade_invalidate
+
+    checkpoints = tmp_path / ".daf-checkpoints" / "phase-1-xyz"
+    checkpoints.mkdir(parents=True)
+    (checkpoints / "brand-profile.json").write_text('{"name": "Test"}')
+
+    _cascade_invalidate(str(tmp_path), 0)
+
+    assert (tmp_path / ".daf-checkpoints").exists(), ".daf-checkpoints must NOT be removed by cascade"
+
+
+def test_run_simple_crew_checkpoint_phase_uses_crew_phase_map(tmp_path: Path) -> None:
+    """Phase passed to cm.create is sourced from _CREW_PHASE_MAP, not a hardcoded literal."""
+    from daf.agents.first_publish import _run_simple_crew, _CREW_PHASE_MAP
+    from daf.tools.crew_sequencer import CrewResult as CR
+
+    mock_cm = MagicMock()
+    mock_reporter = MagicMock()
+    crew = MagicMock()
+    crew.kickoff.return_value = CR(crew="component_factory", status="success", artifacts_written=[])
+    factory = MagicMock(return_value=crew)
+
+    expected_phase = _CREW_PHASE_MAP["component_factory"]
+    _run_simple_crew("component_factory", factory, str(tmp_path), mock_reporter, cm=mock_cm, phase=expected_phase)
+
+    mock_cm.create.assert_called_once_with(output_dir=str(tmp_path), phase=expected_phase)
+
+
+def test_cascade_invalidate_is_idempotent(tmp_path: Path) -> None:
+    """Calling _cascade_invalidate twice raises no error and dirs remain absent."""
+    from daf.agents.first_publish import _cascade_invalidate, _PHASE_ARTIFACT_DIRS
+
+    # Create Phase 4+ dirs
+    for phase, paths in _PHASE_ARTIFACT_DIRS.items():
+        if phase > 3:
+            for p in paths:
+                (tmp_path / p).mkdir(parents=True, exist_ok=True)
+
+    _cascade_invalidate(str(tmp_path), 3)
+    _cascade_invalidate(str(tmp_path), 3)  # second call – must not raise
+
+    for phase, paths in _PHASE_ARTIFACT_DIRS.items():
+        if phase > 3:
+            for p in paths:
+                assert not (tmp_path / p).exists()

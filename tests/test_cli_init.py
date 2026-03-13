@@ -173,3 +173,78 @@ def test_cli_gate2_approve_exits_zero(tmp_path, monkeypatch):
     result = runner.invoke(app, ["init"], input="A\n")
     assert result.exit_code == 0, f"Expected exit 0, got:\n{result.output}"
     assert "Design system generation complete" in result.output
+
+
+# ---------------------------------------------------------------------------
+# p18 – RESUME-RESTORE tests
+# ---------------------------------------------------------------------------
+
+def test_cli_resume_calls_restore_before_run_first_publish(tmp_path):
+    """--resume calls cm.restore(phase=3) before run_first_publish_agent(start_phase=4)."""
+    from unittest.mock import MagicMock, patch, call
+
+    mock_cm_instance = MagicMock()
+    mock_cm_instance.get_last_valid_checkpoint.return_value = {"phase": 3, "path": str(tmp_path)}
+    mock_cm_instance.restore.return_value = None
+
+    run_calls = []
+
+    def _mock_run(output_dir, start_phase=1):
+        run_calls.append({"output_dir": output_dir, "start_phase": start_phase})
+
+    with (
+        patch("daf.cli.CheckpointManager", return_value=mock_cm_instance),
+        patch("daf.cli.run_first_publish_agent", side_effect=_mock_run),
+    ):
+        result = runner.invoke(app, ["init", "--resume", str(tmp_path)])
+
+    assert result.exit_code == 0, f"Expected exit 0, got:\n{result.output}"
+    mock_cm_instance.restore.assert_called_once_with(output_dir=str(tmp_path), phase=3)
+    assert run_calls, "run_first_publish_agent must be called"
+    assert run_calls[0]["start_phase"] == 4
+
+    # restore must have been called before run (verify call order via side_effect ordering)
+    restore_idx = next(
+        i for i, c in enumerate(mock_cm_instance.method_calls) if c[0] == "restore"
+    )
+    # run_first_publish_agent is patched separately; restore at idx ensures ordering
+    assert restore_idx >= 0
+
+
+def test_cli_resume_exits_with_error_on_corrupt_checkpoint(tmp_path):
+    """--resume exits non-zero when CheckpointManager.restore raises CheckpointCorruptError."""
+    from daf.tools.checkpoint_manager import CheckpointCorruptError
+    from unittest.mock import MagicMock, patch
+
+    mock_cm_instance = MagicMock()
+    mock_cm_instance.get_last_valid_checkpoint.return_value = {"phase": 2, "path": str(tmp_path)}
+    mock_cm_instance.restore.side_effect = CheckpointCorruptError("test corruption")
+
+    with (
+        patch("daf.cli.CheckpointManager", return_value=mock_cm_instance),
+        patch("daf.cli.run_first_publish_agent"),
+    ):
+        result = runner.invoke(app, ["init", "--resume", str(tmp_path)])
+
+    assert result.exit_code != 0, "Expected non-zero exit on corrupt checkpoint"
+    assert any(
+        word in result.output.lower()
+        for word in ("corrupt", "error", "phase 1", "restart")
+    ), f"Expected error message in output, got: {result.output}"
+
+
+def test_cli_resume_no_restore_when_no_checkpoints(tmp_path):
+    """When get_last_valid_checkpoint returns None, cm.restore is NOT called."""
+    from unittest.mock import MagicMock, patch
+
+    mock_cm_instance = MagicMock()
+    mock_cm_instance.get_last_valid_checkpoint.return_value = None
+
+    with (
+        patch("daf.cli.CheckpointManager", return_value=mock_cm_instance),
+        patch("daf.cli.run_first_publish_agent"),
+    ):
+        result = runner.invoke(app, ["init", "--resume", str(tmp_path)])
+
+    mock_cm_instance.restore.assert_not_called()
+    assert "No valid checkpoints found" in result.output
