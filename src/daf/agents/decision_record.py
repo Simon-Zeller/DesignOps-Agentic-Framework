@@ -5,12 +5,12 @@ Generates one ADR per significant generation decision found in
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 from daf.tools.decision_extractor import extract_decisions
 from daf.tools.adr_template_generator import generate_adr, slugify_title
+from daf.agents._doc_helpers import write_file as _write_file, load_json as _load_json_helper
 
 
 def _call_llm(prompt: str) -> str:  # pragma: no cover
@@ -18,18 +18,8 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
     return prompt
 
 
-def _write_file(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
 def _load_json(path: Path) -> dict[str, Any]:
-    if path.exists():
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            return {}
-    return {}
+    return _load_json_helper(path)
 
 
 def run_decision_records(output_dir: str) -> None:

@@ -5,13 +5,13 @@ of why the design system looks the way it does.
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 from daf.tools.brand_profile_analyzer import analyze_brand_profile
 from daf.tools.decision_log_reader import read_decisions
 from daf.tools.prose_generator import build_narrative_prompt
+from daf.agents._doc_helpers import write_file as _write_file, load_json as _load_json_helper
 
 
 def _call_llm(prompt: str) -> str:  # pragma: no cover
@@ -19,18 +19,8 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
     return prompt
 
 
-def _write_file(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
 def _load_json(path: Path) -> dict[str, Any]:
-    if path.exists():
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            return {}
-    return {}
+    return _load_json_helper(path)
 
 
 def run_generation_narrative(output_dir: str) -> None:

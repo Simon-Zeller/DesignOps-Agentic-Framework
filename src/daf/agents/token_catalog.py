@@ -5,13 +5,13 @@ tier classification, visual representation, and LLM-generated usage context.
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 from daf.tools.token_value_resolver import resolve_token, classify_tier
 from daf.tools.scale_visualizer import visualize_token
 from daf.tools.usage_context_extractor import extract_usage_context
+from daf.agents._doc_helpers import write_file as _write_file, load_json as _load_json_helper
 
 
 def _call_llm(prompt: str) -> str:  # pragma: no cover
@@ -19,18 +19,8 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
     return prompt
 
 
-def _write_file(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
 def _load_json(path: Path) -> dict[str, Any]:
-    if path.exists():
-        try:
-            return json.loads(path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            return {}
-    return {}
+    return _load_json_helper(path)
 
 
 def run_token_catalog(output_dir: str) -> None:
