@@ -288,7 +288,6 @@ class StyleDictionaryCompiler(BaseTool):
             except (ValueError, KeyError):
                 # Fallback: use $value directly or resolve the base reference
                 raw = str(token_obj.get("$value", ""))
-                import re as _re
                 match = _ALIAS_INNER_RE.match(raw)
                 if match:
                     value = global_tokens.get(match.group(1), raw)

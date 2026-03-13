@@ -6,7 +6,6 @@ warnings. Returns {fatal: list, warnings: list}.
 """
 from __future__ import annotations
 
-import re
 from typing import Any
 
 from crewai.tools import BaseTool
@@ -54,7 +53,7 @@ class DTCGSchemaValidator(BaseTool):
     )
     args_schema: type[BaseModel] = _ValidatorInput
 
-    def _run(self, token_dict: dict[str, Any], **kwargs: Any) -> dict[str, Any]:  # type: ignore[override]
+    def _run(self, token_dict: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
         fatal: list[dict[str, Any]] = []
         warnings: list[dict[str, Any]] = []
 

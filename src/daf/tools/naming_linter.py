@@ -62,7 +62,7 @@ class NamingLinter(BaseTool):
     )
     args_schema: type[BaseModel] = _LinterInput
 
-    def _run(self, keys: list[str], **kwargs: Any) -> dict[str, Any]:  # type: ignore[override]
+    def _run(self, keys: list[str], **kwargs: Any) -> dict[str, Any]:
         fatal: list[dict[str, Any]] = []
         warnings: list[dict[str, Any]] = []
 

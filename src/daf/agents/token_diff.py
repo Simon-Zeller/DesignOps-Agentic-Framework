@@ -12,7 +12,6 @@ from typing import Any
 from crewai import Agent, Task
 
 from daf.tools.json_diff_engine import JsonDiffEngine
-from daf.tools.deprecation_tagger import DeprecationTagger
 
 _TIER_FILES = ("base.tokens.json", "semantic.tokens.json", "component.tokens.json")
 
@@ -37,7 +36,8 @@ def _load_prior_diff(output_dir: str) -> dict[str, Any] | None:
     diff_path = Path(output_dir) / "tokens" / "diff.json"
     if diff_path.exists():
         try:
-            return json.loads(diff_path.read_text(encoding="utf-8"))
+            result: dict[str, Any] = json.loads(diff_path.read_text(encoding="utf-8"))
+            return result
         except json.JSONDecodeError:
             pass
     return None

@@ -58,7 +58,7 @@ class ReferenceGraphWalker(BaseTool):
         semantic: dict[str, Any],
         component: dict[str, Any],
         **kwargs: Any,
-    ) -> dict[str, list[str]]:  # type: ignore[override]
+    ) -> dict[str, list[str]]:
         # Merge all tiers into a single namespace; component > semantic > base
         all_tokens: dict[str, dict[str, Any]] = {}
         all_tokens.update(_walk_tokens(base, tier="base"))

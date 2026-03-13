@@ -35,7 +35,7 @@ class DeprecationTagger(BaseTool):
         path: str,
         metadata: dict[str, Any],
         **kwargs: Any,
-    ) -> dict[str, Any]:  # type: ignore[override]
+    ) -> dict[str, Any]:
         result = copy.deepcopy(token_dict)
         parts = path.split(".")
         node = result

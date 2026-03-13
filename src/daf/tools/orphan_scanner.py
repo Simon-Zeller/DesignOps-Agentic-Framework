@@ -25,7 +25,7 @@ class OrphanScanner(BaseTool):
     )
     args_schema: type[BaseModel] = _ScannerInput
 
-    def _run(self, graph: dict[str, list[str]], **kwargs: Any) -> list[str]:  # type: ignore[override]
+    def _run(self, graph: dict[str, list[str]], **kwargs: Any) -> list[str]:
         all_nodes = set(graph.keys())
         referenced: set[str] = set()
         for targets in graph.values():

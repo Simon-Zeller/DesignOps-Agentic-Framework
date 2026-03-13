@@ -56,17 +56,17 @@ class JsonDiffEngine(BaseTool):
         current: dict[str, Any],
         prior: dict[str, Any] | None = None,
         **kwargs: Any,
-    ) -> dict[str, Any]:  # type: ignore[override]
+    ) -> dict[str, Any]:
         current_flat = _flatten_tokens(current)
 
         if prior is None:
-            added = [
+            initial_added = [
                 {"token_path": path, "value": obj.get("$value")}
                 for path, obj in current_flat.items()
             ]
             return {
                 "is_initial_generation": True,
-                "added": added,
+                "added": initial_added,
                 "modified": [],
                 "removed": [],
                 "deprecated": [],

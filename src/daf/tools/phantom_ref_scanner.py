@@ -32,7 +32,7 @@ class PhantomRefScanner(BaseTool):
         merged_namespace: set[str],
         references: dict[str, str],
         **kwargs: Any,
-    ) -> list[dict[str, str]]:  # type: ignore[override]
+    ) -> list[dict[str, str]]:
         phantoms: list[dict[str, str]] = []
         for token_path, target in references.items():
             if target not in merged_namespace:

@@ -60,5 +60,5 @@ class CircularRefDetector(BaseTool):
     )
     args_schema: type[BaseModel] = _DetectorInput
 
-    def _run(self, graph: dict[str, list[str]], **kwargs: Any) -> list[list[str]]:  # type: ignore[override]
+    def _run(self, graph: dict[str, list[str]], **kwargs: Any) -> list[list[str]]:
         return _detect_cycles(graph)

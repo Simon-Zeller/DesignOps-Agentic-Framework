@@ -197,7 +197,6 @@ def run_token_foundation_task(
     In tests this function is monkeypatched.
     """
     import json
-    from pathlib import Path
 
     from crewai import Crew
 
@@ -213,7 +212,7 @@ def run_token_foundation_task(
     retry_suffix = ""
     if retry_context:
         retry_suffix = (
-            f"\n\nPREVIOUS REJECTIONS (accumulated context):\n"
+            "\n\nPREVIOUS REJECTIONS (accumulated context):\n"
             + json.dumps(retry_context, indent=2)
         )
 
