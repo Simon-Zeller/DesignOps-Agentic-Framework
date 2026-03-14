@@ -188,18 +188,21 @@ def test_idempotent_second_call_overwrites_without_error(tmp_path):
 # Error cases
 # ---------------------------------------------------------------------------
 
-def test_missing_accessibility_key_raises_error(tmp_path):
+def test_missing_accessibility_key_defaults_to_aa(tmp_path):
     from daf.tools.config_generator import generate_pipeline_config
 
-    with pytest.raises((KeyError, ValueError)):
-        generate_pipeline_config({"scope": "starter"}, str(tmp_path))
+    generate_pipeline_config({"scope": "starter"}, str(tmp_path))
+    config = json.loads((tmp_path / "pipeline-config.json").read_text())
+    assert config["qualityGates"]["a11yLevel"] == "AA"
 
 
-def test_missing_scope_key_raises_error(tmp_path):
+def test_missing_scope_key_defaults_to_starter(tmp_path):
     from daf.tools.config_generator import generate_pipeline_config
 
-    with pytest.raises((KeyError, ValueError)):
-        generate_pipeline_config({"accessibility": {"level": "AA"}}, str(tmp_path))
+    generate_pipeline_config({"accessibility": {"level": "AA"}}, str(tmp_path))
+    config = json.loads((tmp_path / "pipeline-config.json").read_text())
+    # "starter" scope has 80% min test coverage
+    assert config["qualityGates"]["minTestCoverage"] == 80
 
 
 # ---------------------------------------------------------------------------

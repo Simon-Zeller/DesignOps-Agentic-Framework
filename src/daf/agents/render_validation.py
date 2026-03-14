@@ -112,7 +112,7 @@ def _validate_renders(output_dir: str) -> None:
 
 def create_render_validation_agent() -> Agent:
     """Instantiate the Render Validation Agent (Agent 15 — Tier 3, Haiku)."""
-    model = os.environ.get("DAF_TIER3_MODEL", "claude-haiku-4-20250514")
+    model = os.environ.get("DAF_TIER3_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Render Validation Specialist",
         goal=(

@@ -180,7 +180,7 @@ def create_token_validation_agent() -> Agent:
     """Instantiate the Token Validation Agent (Agent 8 — Tier 2, Sonnet)."""
     import os
 
-    model = os.environ.get("DAF_TIER2_MODEL", "claude-sonnet-4-20250514")
+    model = os.environ.get("DAF_TIER2_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Token Validation Specialist",
         goal=(

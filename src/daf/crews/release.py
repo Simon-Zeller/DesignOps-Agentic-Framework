@@ -21,8 +21,8 @@ from daf.agents.release_changelog import create_release_changelog_agent
 from daf.agents.codemod import create_codemod_agent
 from daf.agents.publish import create_publish_agent
 
-_SONNET_MODEL = "claude-3-5-sonnet-20241022"
-_HAIKU_MODEL = "claude-3-5-haiku-20241022"
+_SONNET_MODEL = "anthropic/claude-sonnet-4-20250514"
+_HAIKU_MODEL = "anthropic/claude-sonnet-4-20250514"
 
 
 def create_release_crew(output_dir: str) -> Crew:

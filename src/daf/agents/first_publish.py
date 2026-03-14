@@ -46,7 +46,7 @@ MAX_PHASE46_RETRIES = 2   # Phases 4–6 crews get 2 attempts
 # Phase numbers for retry-category logic
 _CRITICAL_PHASE_CREWS = {"token_engine", "design_to_code", "component_factory"}
 
-_HAIKU_MODEL = "claude-3-5-haiku-20241022"
+_HAIKU_MODEL = "anthropic/claude-sonnet-4-20250514"
 
 # Maps each crew name to its canonical pipeline phase integer.
 _CREW_PHASE_MAP: dict[str, int] = {
@@ -73,7 +73,7 @@ _PHASE_ARTIFACT_DIRS: dict[int, list[str]] = {
 
 def create_first_publish_agent() -> Agent:
     """Instantiate Agent 6: First Publish Agent (Tier 2 — Claude Sonnet)."""
-    model = os.environ.get("DAF_TIER2_MODEL", "claude-sonnet-4-20250514")
+    model = os.environ.get("DAF_TIER2_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="First Publish Orchestrator",
         goal=(

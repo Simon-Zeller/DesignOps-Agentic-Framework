@@ -61,8 +61,8 @@ def generate_pipeline_config(brand_profile: dict, output_dir: str) -> str:
     """Generate pipeline-config.json from a validated Brand Profile.
 
     Args:
-        brand_profile: Validated Brand Profile dict (must contain ``scope`` and
-            ``accessibility.level`` keys).
+        brand_profile: Validated Brand Profile dict (must contain ``componentScope`` and
+            ``accessibility`` keys).
         output_dir: Directory to write ``pipeline-config.json`` into.
 
     Returns:
@@ -71,8 +71,9 @@ def generate_pipeline_config(brand_profile: dict, output_dir: str) -> str:
     Raises:
         KeyError: If ``brand_profile`` is missing required top-level keys.
     """
-    scope: str = brand_profile["scope"]
-    a11y_level: str = brand_profile["accessibility"]["level"]
+    scope: str = brand_profile.get("componentScope") or brand_profile.get("scope", "starter")
+    a11y_raw = brand_profile.get("accessibility", "AA")
+    a11y_level: str = a11y_raw["level"] if isinstance(a11y_raw, dict) else str(a11y_raw)
 
     if scope not in _SCOPE_COVERAGE_MAP:
         raise ValueError(f"Unknown scope tier: {scope!r}")

@@ -16,7 +16,7 @@ from daf.tools.core_component_spec_generator import CoreComponentSpecGenerator
 
 def create_core_component_agent() -> Agent:
     """Instantiate the Core Component Agent (Tier 2 — Sonnet)."""
-    model = os.environ.get("DAF_TIER2_MODEL", "claude-sonnet-4-20250514")
+    model = os.environ.get("DAF_TIER2_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Core Component Agent",
         goal=(

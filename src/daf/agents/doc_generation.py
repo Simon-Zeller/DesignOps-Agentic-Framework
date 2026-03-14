@@ -118,3 +118,21 @@ def run_doc_generation(output_dir: str) -> None:
 
     readme_content = render_readme(component_names, token_categories)
     _write_file(od / "docs" / "README.md", readme_content)
+
+    # Build docs/component-index.json for downstream crews (Governance, Analytics)
+    component_index: dict[str, Any] = {}
+    for spec_file in spec_files:
+        try:
+            raw = yaml.safe_load(spec_file.read_text(encoding="utf-8")) or {}
+        except Exception:
+            continue
+        name = raw.get("component", spec_file.stem)
+        deps: list[str] = []
+        comp_rules = raw.get("compositionRules", {})
+        if isinstance(comp_rules, dict):
+            composes_from = comp_rules.get("composesFrom", [])
+            if isinstance(composes_from, list):
+                deps = [str(d) for d in composes_from]
+        component_index[name] = {"dependencies": deps}
+    import json as _json
+    _write_file(od / "docs" / "component-index.json", _json.dumps(component_index, indent=2))

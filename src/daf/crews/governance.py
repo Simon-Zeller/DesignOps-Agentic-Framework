@@ -19,8 +19,8 @@ from daf.agents.rfc import create_rfc_agent
 from daf.agents.quality_gate import create_quality_gate_agent
 from daf.agents.exit_criteria import create_exit_criteria_agent
 
-_SONNET_MODEL = "claude-3-5-sonnet-20241022"
-_HAIKU_MODEL = "claude-3-5-haiku-20241022"
+_SONNET_MODEL = "anthropic/claude-sonnet-4-20250514"
+_HAIKU_MODEL = "anthropic/claude-sonnet-4-20250514"
 
 
 def create_governance_crew(output_dir: str) -> Crew:
@@ -117,12 +117,12 @@ def create_governance_crew(output_dir: str) -> Crew:
             "Read reports/quality-scorecard.json and the docs/ directory. "
             "Evaluate five quality gates (coverage ≥ 80%, zero a11y critical violations, "
             "no phantom token refs, all components have docs, all have usage examples) "
-            "per component. Write governance/quality-gates.json. "
+            "per component. Write reports/governance/quality-gates.json. "
             "Generate tests/tokens.test.ts, tests/a11y.test.ts, "
             "tests/composition.test.ts, tests/compliance.test.ts."
         ),
         expected_output=(
-            "JSON file at governance/quality-gates.json with per-component gate pass/fail, "
+            "JSON file at reports/governance/quality-gates.json with per-component gate pass/fail, "
             "and four TypeScript test suites in tests/."
         ),
         agent=quality_gate_agent,

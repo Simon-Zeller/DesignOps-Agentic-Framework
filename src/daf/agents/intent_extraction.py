@@ -83,7 +83,7 @@ def _extract_intents(output_dir: str) -> None:
 
 def create_intent_extraction_agent() -> Agent:
     """Instantiate the Intent Extraction Agent (Agent 13 — Tier 2, Sonnet)."""
-    model = os.environ.get("DAF_TIER2_MODEL", "claude-sonnet-4-5")
+    model = os.environ.get("DAF_TIER2_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Component Intent Extractor",
         goal=(

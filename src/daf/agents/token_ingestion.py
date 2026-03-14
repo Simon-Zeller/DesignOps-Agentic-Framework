@@ -76,7 +76,7 @@ def create_token_ingestion_agent() -> Agent:
     """Instantiate the Token Ingestion Agent (Agent 7 — Tier 3, Haiku)."""
     import os
 
-    model = os.environ.get("DAF_TIER3_MODEL", "claude-haiku-4-20250514")
+    model = os.environ.get("DAF_TIER3_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Token Ingestion Specialist",
         goal=(

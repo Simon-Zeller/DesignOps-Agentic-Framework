@@ -19,8 +19,8 @@ from daf.agents.registry_maintenance import create_registry_maintenance_agent
 from daf.agents.token_resolution import create_token_resolution_agent
 from daf.agents.validation_rule import create_validation_rule_agent
 
-_SONNET_MODEL = "claude-3-5-sonnet-20241022"
-_HAIKU_MODEL = "claude-3-5-haiku-20241022"
+_SONNET_MODEL = "anthropic/claude-sonnet-4-20250514"
+_HAIKU_MODEL = "anthropic/claude-sonnet-4-20250514"
 
 
 def create_ai_semantic_layer_crew(output_dir: str) -> Crew:

@@ -117,7 +117,7 @@ def _generate_code(output_dir: str) -> None:
 
 def create_code_generation_agent() -> Agent:
     """Instantiate the Code Generation Agent (Agent 14 — Tier 1, Opus)."""
-    model = os.environ.get("DAF_TIER1_MODEL", "claude-opus-4-5")
+    model = os.environ.get("DAF_TIER1_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Component Code Generator",
         goal=(

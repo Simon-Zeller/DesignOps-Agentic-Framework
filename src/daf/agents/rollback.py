@@ -21,7 +21,7 @@ from daf.tools.rollback_reporter import RollbackReporter
 def create_rollback_agent(model: str | None = None, output_dir: str = "") -> Agent:
     """Agent 40 – Generation Checkpoint Manager (Release Crew, Phase 6)."""
     if model is None:
-        model = os.environ.get("DAF_TIER3_MODEL", "claude-haiku-4-20250414")
+        model = os.environ.get("DAF_TIER3_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Generation checkpoint manager",
         goal=(

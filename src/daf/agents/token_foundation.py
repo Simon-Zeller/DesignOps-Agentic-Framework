@@ -19,7 +19,7 @@ from daf.tools.modular_scale_calculator import ModularScaleCalculator
 
 def create_token_foundation_agent() -> Agent:
     """Instantiate the Token Foundation Agent (Tier 2 — Analytical, Claude Sonnet)."""
-    model = os.environ.get("DAF_TIER2_MODEL", "claude-sonnet-4-20250514")
+    model = os.environ.get("DAF_TIER2_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Token Foundation Specialist",
         goal=(

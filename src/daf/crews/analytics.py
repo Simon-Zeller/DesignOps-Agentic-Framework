@@ -19,8 +19,8 @@ from daf.agents.pipeline_completeness import create_pipeline_completeness_agent
 from daf.agents.token_compliance_agent import create_token_compliance_agent
 from daf.agents.usage_tracking import create_usage_tracking_agent
 
-_SONNET_MODEL = "claude-3-5-sonnet-20241022"
-_HAIKU_MODEL = "claude-3-5-haiku-20241022"
+_SONNET_MODEL = "anthropic/claude-sonnet-4-20250514"
+_HAIKU_MODEL = "anthropic/claude-sonnet-4-20250514"
 
 
 def create_analytics_crew(output_dir: str) -> Crew:

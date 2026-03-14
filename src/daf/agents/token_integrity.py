@@ -206,7 +206,7 @@ def create_token_integrity_agent() -> Agent:
     """Instantiate the Token Integrity Agent (Agent 10 — Tier 2, Sonnet)."""
     import os
 
-    model = os.environ.get("DAF_TIER2_MODEL", "claude-sonnet-4-20250514")
+    model = os.environ.get("DAF_TIER2_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Token Integrity Specialist",
         goal=(

@@ -55,16 +55,19 @@ def test_tool_run_returns_error_string_for_invalid_scope(tmp_path) -> None:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.integration
 def test_create_core_component_agent_returns_agent() -> None:
     agent = create_core_component_agent()
     assert isinstance(agent, crewai.Agent)
 
 
+@pytest.mark.integration
 def test_core_component_agent_role() -> None:
     agent = create_core_component_agent()
     assert agent.role == "Core Component Agent"
 
 
+@pytest.mark.integration
 def test_core_component_agent_has_tool() -> None:
     agent = create_core_component_agent()
     tool_types = [type(t) for t in agent.tools]

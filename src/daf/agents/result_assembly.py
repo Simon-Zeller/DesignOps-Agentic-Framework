@@ -115,7 +115,7 @@ def _assemble_results(output_dir: str) -> None:
 
 def create_result_assembly_agent() -> Agent:
     """Instantiate the Result Assembly Agent (Agent 16 — Tier 3, Haiku)."""
-    model = os.environ.get("DAF_TIER3_MODEL", "claude-haiku-4-20250514")
+    model = os.environ.get("DAF_TIER3_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Generation Result Assembler",
         goal=(

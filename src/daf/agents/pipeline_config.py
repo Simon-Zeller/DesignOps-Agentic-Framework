@@ -20,7 +20,7 @@ from daf.tools.project_scaffolder import ProjectScaffolder
 
 def create_pipeline_config_agent() -> Agent:
     """Instantiate the Pipeline Configuration Agent (Tier 2 — Sonnet)."""
-    model = os.environ.get("DAF_TIER2_MODEL", "claude-sonnet-4-20250514")
+    model = os.environ.get("DAF_TIER2_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Pipeline Configuration Agent",
         goal=(

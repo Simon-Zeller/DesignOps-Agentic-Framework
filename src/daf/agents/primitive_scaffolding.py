@@ -16,7 +16,7 @@ from daf.tools.primitive_spec_generator import PrimitiveSpecGenerator
 
 def create_primitive_scaffolding_agent() -> Agent:
     """Instantiate the Primitive Scaffolding Agent (Tier 3 — Haiku)."""
-    model = os.environ.get("DAF_TIER3_MODEL", "claude-3-haiku-20240307")
+    model = os.environ.get("DAF_TIER3_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Primitive Scaffolding Agent",
         goal=(

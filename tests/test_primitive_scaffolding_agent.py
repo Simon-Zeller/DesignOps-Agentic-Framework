@@ -41,6 +41,7 @@ def test_primitive_spec_generator_tool_run_produces_files(tmp_path: Path) -> Non
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.integration
 def test_create_primitive_scaffolding_agent_returns_agent() -> None:
     from crewai import Agent
 
@@ -50,6 +51,7 @@ def test_create_primitive_scaffolding_agent_returns_agent() -> None:
     )
 
 
+@pytest.mark.integration
 def test_primitive_scaffolding_agent_has_tool() -> None:
     agent = create_primitive_scaffolding_agent()
     tool_types = [type(t) for t in agent.tools]

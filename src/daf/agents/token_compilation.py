@@ -130,7 +130,7 @@ def create_token_compilation_agent() -> Agent:
     """Instantiate the Token Compilation Agent (Agent 9 — Tier 3, Haiku)."""
     import os
 
-    model = os.environ.get("DAF_TIER3_MODEL", "claude-haiku-4-20250514")
+    model = os.environ.get("DAF_TIER3_MODEL", "anthropic/claude-sonnet-4-20250514")
     return Agent(
         role="Token Compilation Specialist",
         goal=(
