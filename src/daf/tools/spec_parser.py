@@ -32,7 +32,8 @@ def parse_spec(path: str) -> dict[str, Any] | None:
 
     known_keys = {
         "component", "description", "variants", "states", "composedOf",
-        "allowedChildren", "tokens", "layout", "a11y",
+        "allowedChildren", "tokens", "tokenBindings", "layout", "a11y",
+        "a11yRequirements", "props", "compositionRules",
     }
     result: dict[str, Any] = {}
     metadata: dict[str, Any] = {}

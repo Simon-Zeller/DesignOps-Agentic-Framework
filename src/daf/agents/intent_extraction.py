@@ -58,22 +58,63 @@ def _extract_intents(output_dir: str) -> None:
             spec = {"component": name}
 
         layout = extract_layout(spec)
-        aria = extract_a11y_attributes(spec)
 
-        # Build token bindings from spec tokens field
+        # a11y: try both field names (a11y from parse_spec, a11yRequirements from raw spec)
+        a11y_spec = spec.get("a11y") or spec.get("a11yRequirements") or {}
+        # If parsed spec stored a11yRequirements in metadata, check there too
+        meta = spec.get("metadata") or {}
+        if not a11y_spec:
+            a11y_spec = meta.get("a11yRequirements") or {}
+        aria = extract_a11y_attributes({"a11y": a11y_spec})
+
+        # Build token bindings — handle both formats:
+        # 1. "tokens" dict: {key: token_ref}
+        # 2. "tokenBindings" list: [{prop: ..., $value: ...}]
         token_bindings: list[dict[str, str]] = []
-        for key, token_ref in (spec.get("tokens") or {}).items():
-            token_bindings.append({"key": key, "token": token_ref})
+        raw_tokens = spec.get("tokens") or {}
+        if isinstance(raw_tokens, dict):
+            for key, token_ref in raw_tokens.items():
+                token_bindings.append({"key": key, "token": str(token_ref)})
+
+        raw_bindings = spec.get("tokenBindings") or meta.get("tokenBindings") or []
+        if isinstance(raw_bindings, list):
+            for binding in raw_bindings:
+                if isinstance(binding, dict):
+                    prop = binding.get("prop", "")
+                    val = binding.get("$value", "").strip("{}") if binding.get("$value") else ""
+                    if prop and val:
+                        token_bindings.append({"key": prop, "token": val})
+
+        # Extract props from spec
+        raw_props = spec.get("props") or meta.get("props") or {}
+        props: list[dict[str, Any]] = []
+        if isinstance(raw_props, dict):
+            for prop_name, prop_meta in raw_props.items():
+                if not isinstance(prop_meta, dict):
+                    prop_meta = {}
+                props.append({
+                    "name": prop_name,
+                    "type": prop_meta.get("type", "any"),
+                    "required": bool(prop_meta.get("required", False)),
+                    "default": prop_meta.get("default"),
+                    "description": prop_meta.get("description", ""),
+                })
+
+        # Composition rules
+        comp_rules = spec.get("compositionRules") or meta.get("compositionRules") or {}
 
         manifests.append({
             "component_name": name,
+            "description": spec.get("description") or meta.get("description") or "",
             "tier": comp.get("tier", "simple"),
             "variants": spec.get("variants") or [],
             "states": spec.get("states") or [],
             "composedOf": spec.get("composedOf") or [],
             "token_bindings": token_bindings,
+            "props": props,
             "layout": layout,
             "aria": aria,
+            "compositionRules": comp_rules,
         })
 
     (od / "intent_manifests.json").write_text(

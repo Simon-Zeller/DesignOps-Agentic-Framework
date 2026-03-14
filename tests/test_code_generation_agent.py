@@ -45,8 +45,8 @@ def test_code_generation_writes_three_files_per_component(tmp_path):
     assert (tmp_path / "src" / "components" / "Button" / "Button.stories.tsx").exists()
 
 
-def test_code_generation_writes_rejection_file_on_unresolvable_token(tmp_path):
-    """Agent writes generation-rejection.json when a token reference can't be resolved."""
+def test_code_generation_writes_warning_file_on_unresolvable_token(tmp_path):
+    """Agent writes generation-rejection.json with warnings when a token reference can't be resolved."""
     from daf.agents.code_generation import _generate_code
 
     _write_intent_manifests(tmp_path, with_bad_token=True)
@@ -57,5 +57,5 @@ def test_code_generation_writes_rejection_file_on_unresolvable_token(tmp_path):
     rejection_path = tmp_path / "reports" / "generation-rejection.json"
     assert rejection_path.exists(), "generation-rejection.json was not created"
     data = json.loads(rejection_path.read_text())
-    assert len(data["rejected_components"]) >= 1
-    assert data["rejected_components"][0]["reason"] == "unresolvable_token_ref"
+    assert len(data["token_warnings"]) >= 1
+    assert data["token_warnings"][0]["reason"] == "unresolvable_token_ref"

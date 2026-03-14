@@ -23,6 +23,78 @@ def _call_llm(prompt: str) -> str:  # pragma: no cover
     return prompt
 
 
+def _generate_basic_example(name: str, raw: dict[str, Any]) -> str:
+    """Generate a deterministic basic TSX usage example from spec data."""
+    props_dict = raw.get("props", {})
+    variants = raw.get("variants", [])
+
+    # Build minimal required props
+    prop_parts: list[str] = []
+    has_children = False
+    for pname, pdef in (props_dict.items() if isinstance(props_dict, dict) else []):
+        if pname == "children":
+            has_children = True
+            continue
+        if isinstance(pdef, dict) and pdef.get("required"):
+            ptype = pdef.get("type", "string")
+            if ptype == "string":
+                prop_parts.append(f'{pname}="example"')
+            elif ptype == "boolean":
+                prop_parts.append(pname)
+            elif "() => void" in str(ptype) or ptype == "function":
+                prop_parts.append(f"{pname}={{() => {{}}}}")
+
+    if variants:
+        prop_parts.insert(0, f'variant="{variants[0]}"')
+
+    props_str = " " + " ".join(prop_parts) if prop_parts else ""
+    child_text = name if has_children or "children" not in [p for p in props_dict] else ""
+
+    if child_text:
+        return f"```tsx\nimport {{ {name} }} from '@design-system/{name}';\n\n<{name}{props_str}>{child_text}</{name}>\n```"
+    return f"```tsx\nimport {{ {name} }} from '@design-system/{name}';\n\n<{name}{props_str} />\n```"
+
+
+def _generate_advanced_example(name: str, raw: dict[str, Any]) -> str:
+    """Generate a deterministic advanced TSX usage example from spec data."""
+    props_dict = raw.get("props", {})
+    variants = raw.get("variants", [])
+    a11y = raw.get("a11yRequirements", raw.get("a11y", {}))
+
+    prop_lines: list[str] = []
+    has_children = False
+    for pname, pdef in (props_dict.items() if isinstance(props_dict, dict) else []):
+        if pname == "children":
+            has_children = True
+            continue
+        ptype = pdef.get("type", "string") if isinstance(pdef, dict) else "string"
+        default = pdef.get("default") if isinstance(pdef, dict) else None
+        if ptype == "string":
+            val = f'"{default}"' if default and str(default) not in ("null", "None") else f'"my-{pname}"'
+            prop_lines.append(f"  {pname}={val}")
+        elif ptype == "boolean":
+            prop_lines.append(f"  {pname}={{{str(default).lower() if default is not None else 'true'}}}")
+        elif "() => void" in str(ptype) or ptype == "function":
+            prop_lines.append(f"  {pname}={{() => console.log('{pname}')}}")
+        elif ptype == "number":
+            prop_lines.append(f"  {pname}={{{default if default is not None else 42}}}")
+
+    if variants and len(variants) > 1:
+        prop_lines.insert(0, f'  variant="{variants[1]}"')
+    elif variants:
+        prop_lines.insert(0, f'  variant="{variants[0]}"')
+
+    if isinstance(a11y, dict) and a11y.get("role"):
+        prop_lines.append(f'  aria-label="{name} example"')
+
+    props_block = "\n".join(prop_lines)
+    child_text = f"  {name} content" if has_children else ""
+
+    if child_text:
+        return f"```tsx\nimport {{ {name} }} from '@design-system/{name}';\n\n<{name}\n{props_block}\n>\n{child_text}\n</{name}>\n```"
+    return f"```tsx\nimport {{ {name} }} from '@design-system/{name}';\n\n<{name}\n{props_block}\n/>\n```"
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     return cast(dict[str, Any], _load_json_helper(path))
 
@@ -79,14 +151,9 @@ def run_doc_generation(output_dir: str) -> None:
             else "No variants declared."
         )
 
-        # Usage examples via LLM
-        basic_prompt = f"Write a minimal TSX usage example for the {name} component."
-        advanced_prompt = (
-            f"Write an advanced TSX usage example for the {name} component "
-            f"using all significant props."
-        )
-        basic_example = _call_llm(basic_prompt) or f"```tsx\n<{name} />\n```"
-        advanced_example = _call_llm(advanced_prompt) or f"```tsx\n<{name} label='Hello' />\n```"
+        # Usage examples — deterministic from spec data
+        basic_example = _generate_basic_example(name, raw)
+        advanced_example = _generate_advanced_example(name, raw)
 
         # Token binding table
         token_bindings = sections["token_bindings"]

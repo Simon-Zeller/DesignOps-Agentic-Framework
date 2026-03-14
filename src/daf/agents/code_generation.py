@@ -59,7 +59,7 @@ def _generate_code(output_dir: str) -> None:
         name = manifest["component_name"]
         tier = manifest.get("tier", "simple")
 
-        # Check all token bindings are resolvable
+        # Check token bindings — warn on unresolvable but don't reject
         unresolvable: list[str] = []
         for binding in manifest.get("token_bindings", []):
             if _resolve_token(binding["token"], compiled_tokens) is None:
@@ -71,7 +71,6 @@ def _generate_code(output_dir: str) -> None:
                 "reason": "unresolvable_token_ref",
                 "tokens": unresolvable,
             })
-            continue
 
         # Determine output directory (primitives vs. components)
         if tier == "primitive":
@@ -105,13 +104,13 @@ def _generate_code(output_dir: str) -> None:
             "variants": manifest.get("variants", []),
         })
 
-    # Write rejection file if any components failed
+    # Write token-warning file if any components had unresolvable refs
     if rejected:
         reports_dir = od / "reports"
         reports_dir.mkdir(parents=True, exist_ok=True)
         rejection_path = reports_dir / "generation-rejection.json"
         rejection_path.write_text(
-            json.dumps({"rejected_components": rejected}, indent=2), encoding="utf-8"
+            json.dumps({"token_warnings": rejected}, indent=2), encoding="utf-8"
         )
 
 

@@ -31,7 +31,21 @@ def render_spec_to_sections(spec_dict: dict[str, Any]) -> dict[str, Any]:
         )
 
     variants: list[str] = list(spec_dict.get("variants", []) or [])
-    token_bindings: dict[str, str] = dict(spec_dict.get("tokens", {}) or {})
+
+    # Support both "tokens" (dict) and "tokenBindings" (list of {prop, $value})
+    token_bindings: dict[str, str] = {}
+    raw_tokens = spec_dict.get("tokens")
+    if isinstance(raw_tokens, dict):
+        token_bindings = dict(raw_tokens)
+
+    raw_bindings = spec_dict.get("tokenBindings")
+    if isinstance(raw_bindings, list):
+        for binding in raw_bindings:
+            if isinstance(binding, dict):
+                prop = binding.get("prop", "")
+                val = binding.get("$value", "")
+                if prop and val:
+                    token_bindings[prop] = val
 
     return {
         "name": name,
